@@ -5,10 +5,10 @@
 void setup()
 {
   CommandInit();
-  
+
   Serial.begin(BIT_RATE);
   Serial.println("Hello World");
-  
+
   Serial.print("> ");
 }
 

@@ -15,7 +15,7 @@
 #define ARGC_MAX 8
 
 #define IS_TERMINATION(c) ((c) == '\r' || (c) == '\n' || (c) == '\0')
-#define IS_SPACE(c)       ((c) ==' ')
+#define IS_SPACE(c)       ((c) == ' ')
 #define IS_ERROR(code)    ((code) != SUCCESS)
 
 static char ReadBuffer[READ_BUFFER_SIZE];
@@ -26,6 +26,7 @@ static char* ArgV[ARGC_MAX];
 static void execute_command(unsigned short argc, char** argv);
 static unsigned short cmd_echo(unsigned short argc, char** argv);
 static unsigned short cmd_dw(unsigned short argc, char** argv);
+static unsigned short cmd_dr(unsigned short argc, char** argv);
 
 static unsigned short get_arg(char* line, char** argv);
 
@@ -40,6 +41,7 @@ static const SCommand COMMAND_TABLE[] =                           // コマン�
 {
   {"echo", cmd_echo, "echo <prm>            :display prm"},
   {"dw",   cmd_dw,   "dw <pin> <value(0/1)> :digitalWrite(pin,value)"},
+  {"dr",   cmd_dr,   "dr <pin>              :digitalRead(pin)"},
 };
 
 static unsigned short cmd_echo(unsigned short argc, char** argv)
@@ -82,6 +84,25 @@ static unsigned short cmd_dw(unsigned short argc, char** argv)
   return SUCCESS;
 }
 
+static unsigned short cmd_dr(unsigned short argc, char** argv)
+{
+  unsigned short pin_num;
+  short value;
+
+  if(argc < 1)
+  {
+    return ERROR;
+  }
+
+  pin_num = atoi(argv[0]);
+
+  value = digitalRead(pin_num);
+
+  Serial.println(value);
+
+  return SUCCESS;
+}
+
 static unsigned short get_arg(char* line, char** argv)
 {
   unsigned short i;
@@ -112,7 +133,7 @@ static unsigned short get_arg(char* line, char** argv)
     if(IS_TERMINATION(line[i - 1]))
     {
       argv[argc] = &line[i];
-      argc++; 
+      argc++;
 
       if(argc == ARGC_MAX)
       {
@@ -156,7 +177,6 @@ void CommandInit(void)
 
 void CommandSerialRead(void)
 {
-  
  if(Serial.available() <= 0)
   {
     return;
@@ -179,7 +199,7 @@ void CommandSerialRead(void)
 
     ArgC = get_arg(&ReadBuffer[0], ArgV);
     execute_command(ArgC, ArgV);
-    
+
     pReadBufferEnd = &ReadBuffer[0];
 
     Serial.print("> ");
