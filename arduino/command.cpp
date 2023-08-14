@@ -27,6 +27,8 @@ static void execute_command(unsigned short argc, char** argv);
 static unsigned short cmd_echo(unsigned short argc, char** argv);
 static unsigned short cmd_dw(unsigned short argc, char** argv);
 static unsigned short cmd_dr(unsigned short argc, char** argv);
+static unsigned short cmd_aw(unsigned short argc, char** argv);
+static unsigned short cmd_ar(unsigned short argc, char** argv);
 
 static unsigned short get_arg(char* line, char** argv);
 
@@ -42,7 +44,33 @@ static const SCommand COMMAND_TABLE[] =                           // コマン�
   {"echo", cmd_echo, "echo <prm>            :display prm"},
   {"dw",   cmd_dw,   "dw <pin> <value(0/1)> :digitalWrite(pin,value)"},
   {"dr",   cmd_dr,   "dr <pin>              :digitalRead(pin)"},
+  {"aw",   cmd_aw,   "aw <pin> <dec>        :analogWrite(pin,dec)"},
+  {"ar",   cmd_ar,   "ar <pin>              :analogRead(pin)"},
 };
+
+static void execute_command(unsigned short argc, char** argv)
+{
+  unsigned short i;
+  unsigned short result;
+
+  for(i = 0; i < sizeof(COMMAND_TABLE) / sizeof(SCommand); i++)
+  {
+    if(!strcmp(COMMAND_TABLE[i].key, argv[0]))
+    {
+      result = COMMAND_TABLE[i].func(argc - 1, &argv[1]);
+      if(IS_ERROR(result))
+      {
+        Serial.println(COMMAND_TABLE[i].usage);
+      }
+      return;
+    }
+  }
+
+  for(i = 0; i < sizeof(COMMAND_TABLE) / sizeof(SCommand); i++)
+  {
+    Serial.println(COMMAND_TABLE[i].usage);
+  }
+}
 
 static unsigned short cmd_echo(unsigned short argc, char** argv)
 {
@@ -103,6 +131,43 @@ static unsigned short cmd_dr(unsigned short argc, char** argv)
   return SUCCESS;
 }
 
+static unsigned short cmd_aw(unsigned short argc, char** argv)
+{
+  unsigned short pin_num;
+  unsigned short value;
+
+  if(argc < 2)
+  {
+    return ERROR;
+  }
+
+  pin_num = atoi(argv[0]);
+  value = atoi(argv[1]);
+
+  analogWrite(pin_num, value);
+
+  return SUCCESS;
+}
+
+static unsigned short cmd_ar(unsigned short argc, char** argv)
+{
+  unsigned short pin_num;
+  short value;
+
+  if(argc < 1)
+  {
+    return ERROR;
+  }
+
+  pin_num = atoi(argv[0]);
+
+  value = analogRead(pin_num);
+
+  Serial.println(value);
+
+  return SUCCESS;
+}
+
 static unsigned short get_arg(char* line, char** argv)
 {
   unsigned short i;
@@ -144,30 +209,6 @@ static unsigned short get_arg(char* line, char** argv)
 
   Serial.println("[error]line without end");
   return 0;
-}
-
-static void execute_command(unsigned short argc, char** argv)
-{
-  unsigned short i;
-  unsigned short result;
-
-  for(i = 0; i < sizeof(COMMAND_TABLE) / sizeof(SCommand); i++)
-  {
-    if(!strcmp(COMMAND_TABLE[i].key, argv[0]))
-    {
-      result = COMMAND_TABLE[i].func(argc - 1, &argv[1]);
-      if(IS_ERROR(result))
-      {
-        Serial.println(COMMAND_TABLE[i].usage);
-      }
-      return;
-    }
-  }
-
-  for(i = 0; i < sizeof(COMMAND_TABLE) / sizeof(SCommand); i++)
-  {
-    Serial.println(COMMAND_TABLE[i].usage);
-  }
 }
 
 void CommandInit(void)
