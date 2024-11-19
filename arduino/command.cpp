@@ -107,7 +107,7 @@ static unsigned short cmd_dw(unsigned short argc, char** argv)
   value = atoi(argv[1]);
 
   pinMode(pin_num, OUTPUT);
-  digitalWrite(pin_num, value);
+  digitalWrite(pin_num, (PinStatus)value);
 
   return SUCCESS;
 }

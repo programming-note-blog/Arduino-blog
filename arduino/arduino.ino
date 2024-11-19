@@ -1,3 +1,4 @@
+#include "Arduino.h"
 #include "command.h"
 
 #define BIT_RATE 9600
