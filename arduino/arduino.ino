@@ -1,11 +1,12 @@
 #include "Arduino.h"
 #include "command.h"
+#include "serial.h"
 
 #define BIT_RATE 9600
 
 void setup()
 {
-  CommandInit();
+  SerialInit();
 
   Serial.begin(BIT_RATE);
   Serial.println("Hello World");
@@ -15,5 +16,5 @@ void setup()
 
 void loop()
 {
-  CommandSerialRead();
+  SerialRead();
 }

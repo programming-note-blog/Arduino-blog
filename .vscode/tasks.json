@@ -11,6 +11,7 @@
                 "Sim/main.cpp",
 				//追加のソースコード
 				"arduino/command.cpp",
+                "arduino/serial.cpp",
 				//dmyコード
 				"Sim/dmy_Serial.cpp",
 				"Sim/dmy_Arduino.cpp",
