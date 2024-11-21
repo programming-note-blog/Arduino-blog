@@ -11,26 +11,15 @@
 #endif
 #define ERROR   1
 
-#define READ_BUFFER_SIZE 64
-#define ARGC_MAX 8
-
-#define IS_TERMINATION(c) ((c) == '\r' || (c) == '\n' || (c) == '\0')
-#define IS_SPACE(c)       ((c) == ' ')
 #define IS_ERROR(code)    ((code) != SUCCESS)
 
-static char ReadBuffer[READ_BUFFER_SIZE];
-static char* pReadBufferEnd;
-static unsigned short ArgC;
-static char* ArgV[ARGC_MAX];
+#define COMMAND_TABLE_SIZE (sizeof(COMMAND_TABLE) / sizeof(SCommand))
 
-static void execute_command(unsigned short argc, char** argv);
 static unsigned short cmd_echo(unsigned short argc, char** argv);
 static unsigned short cmd_dw(unsigned short argc, char** argv);
 static unsigned short cmd_dr(unsigned short argc, char** argv);
 static unsigned short cmd_aw(unsigned short argc, char** argv);
 static unsigned short cmd_ar(unsigned short argc, char** argv);
-
-static unsigned short get_arg(char* line, char** argv);
 
 typedef struct tCommand
 {
@@ -48,12 +37,17 @@ static const SCommand COMMAND_TABLE[] =                           // コマン�
   {"ar",   cmd_ar,   "ar <pin>              :analogRead(pin)"},
 };
 
-static void execute_command(unsigned short argc, char** argv)
+void CommandExecute(unsigned short argc, char** argv)
 {
   unsigned short i;
   unsigned short result;
 
-  for(i = 0; i < sizeof(COMMAND_TABLE) / sizeof(SCommand); i++)
+  if (argc == 0)
+	{
+		return;
+	}
+
+  for(i = 0; i < COMMAND_TABLE_SIZE; i++)
   {
     if(!strcmp(COMMAND_TABLE[i].key, argv[0]))
     {
@@ -66,7 +60,8 @@ static void execute_command(unsigned short argc, char** argv)
     }
   }
 
-  for(i = 0; i < sizeof(COMMAND_TABLE) / sizeof(SCommand); i++)
+  Serial.println("[error] Unknown command. Available commands:");
+  for(i = 0; i < COMMAND_TABLE_SIZE; i++)
   {
     Serial.println(COMMAND_TABLE[i].usage);
   }
@@ -166,87 +161,4 @@ static unsigned short cmd_ar(unsigned short argc, char** argv)
   Serial.println(value);
 
   return SUCCESS;
-}
-
-static unsigned short get_arg(char* line, char** argv)
-{
-  unsigned short i;
-  unsigned short argc = 0;
-
-  // 1文字目
-  if(!IS_SPACE(line[0]) && !IS_TERMINATION(line[0]))
-  {
-    argv[argc] = &line[0];
-    argc++;
-  }
-
-  // 2文字目以降
-  for(i = 1; i < READ_BUFFER_SIZE; i++)
-  {
-    if(IS_TERMINATION(line[i]))
-    {
-      line[i] = '\0';
-      return argc;
-    }
-
-    if(IS_SPACE(line[i]))
-    {
-      line[i] = '\0';
-      continue;
-    }
-
-    if(IS_TERMINATION(line[i - 1]))
-    {
-      argv[argc] = &line[i];
-      argc++;
-
-      if(argc == ARGC_MAX)
-      {
-        return ARGC_MAX - 1;
-      }
-    }
-  }
-
-  Serial.println("[error]line without end");
-  return 0;
-}
-
-void CommandInit(void)
-{
-  pReadBufferEnd = &ReadBuffer[0];
-}
-
-void CommandSerialRead(void)
-{
-  if(Serial.available() <= 0)
-  {
-    return;
-  }
-
-  if(pReadBufferEnd == &ReadBuffer[READ_BUFFER_SIZE])
-  {
-    ReadBuffer[READ_BUFFER_SIZE - 1] = '\0';
-  }
-  else
-  {
-    *pReadBufferEnd = (char)Serial.read();
-  }
-
-  if(IS_TERMINATION(*pReadBufferEnd))
-  {
-    Serial.println();
-    
-    *pReadBufferEnd = '\0';
-
-    ArgC = get_arg(&ReadBuffer[0], ArgV);
-    execute_command(ArgC, ArgV);
-
-    pReadBufferEnd = &ReadBuffer[0];
-
-    Serial.print("> ");
-
-    return;
-  }
-
-  pReadBufferEnd++;
 }

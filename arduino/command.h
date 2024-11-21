@@ -1,2 +1,1 @@
-void CommandInit(void);
-void CommandSerialRead(void);
+void CommandExecute(unsigned short argc, char** argv);
