@@ -13,6 +13,8 @@
 
 #define IS_ERROR(code)    ((code) != SUCCESS)
 
+#define COMMAND_TABLE_SIZE (sizeof(COMMAND_TABLE) / sizeof(SCommand))
+
 static unsigned short cmd_echo(unsigned short argc, char** argv);
 static unsigned short cmd_dw(unsigned short argc, char** argv);
 static unsigned short cmd_dr(unsigned short argc, char** argv);
@@ -45,7 +47,7 @@ void CommandExecute(unsigned short argc, char** argv)
 		return;
 	}
 
-  for(i = 0; i < sizeof(COMMAND_TABLE) / sizeof(SCommand); i++)
+  for(i = 0; i < COMMAND_TABLE_SIZE; i++)
   {
     if(!strcmp(COMMAND_TABLE[i].key, argv[0]))
     {
@@ -58,7 +60,8 @@ void CommandExecute(unsigned short argc, char** argv)
     }
   }
 
-  for(i = 0; i < sizeof(COMMAND_TABLE) / sizeof(SCommand); i++)
+  Serial.println("[error] Unknown command. Available commands:");
+  for(i = 0; i < COMMAND_TABLE_SIZE; i++)
   {
     Serial.println(COMMAND_TABLE[i].usage);
   }
