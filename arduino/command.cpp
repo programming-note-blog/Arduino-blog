@@ -1,6 +1,7 @@
 #include <Arduino.h>
 
 #include "command.h"
+#include "pin_control.h"
 
 #ifdef SUCCESS
 #undef SUCCESS
@@ -88,77 +89,48 @@ static unsigned short cmd_echo(unsigned short argc, char** argv)
   return SUCCESS;
 }
 
-static unsigned short cmd_dw(unsigned short argc, char** argv)
-{
-  unsigned short pin_num;
-  unsigned short value;
+static unsigned short cmd_dw(unsigned short argc, char** argv) {
+  if (argc < 2) return ERROR;
 
-  if(argc < 2)
-  {
-    return ERROR;
-  }
+  unsigned short pin = atoi(argv[0]);
+  unsigned short value = atoi(argv[1]);
 
-  pin_num = atoi(argv[0]);
-  value = atoi(argv[1]);
-
-  pinMode(pin_num, OUTPUT);
-  digitalWrite(pin_num, (PinStatus)value);
-
-  return SUCCESS;
+  return PinControlDigitalWrite(pin, value);
 }
 
-static unsigned short cmd_dr(unsigned short argc, char** argv)
-{
-  unsigned short pin_num;
+static unsigned short cmd_dr(unsigned short argc, char** argv) {
+  if (argc < 1) return ERROR;
+
+  unsigned short pin = atoi(argv[0]);
   short value;
 
-  if(argc < 1)
-  {
+  if (IS_ERROR(PinControlDigitalRead(pin, &value))) {
     return ERROR;
   }
-
-  pin_num = atoi(argv[0]);
-
-  value = digitalRead(pin_num);
 
   Serial.println(value);
-
   return SUCCESS;
 }
 
-static unsigned short cmd_aw(unsigned short argc, char** argv)
-{
-  unsigned short pin_num;
-  unsigned short value;
+static unsigned short cmd_aw(unsigned short argc, char** argv) {
+  if (argc < 2) return ERROR;
 
-  if(argc < 2)
-  {
-    return ERROR;
-  }
+  unsigned short pin = atoi(argv[0]);
+  unsigned short value = atoi(argv[1]);
 
-  pin_num = atoi(argv[0]);
-  value = atoi(argv[1]);
-
-  analogWrite(pin_num, value);
-
-  return SUCCESS;
+  return PinControlAnalogWrite(pin, value);
 }
 
-static unsigned short cmd_ar(unsigned short argc, char** argv)
-{
-  unsigned short pin_num;
+static unsigned short cmd_ar(unsigned short argc, char** argv) {
+  if (argc < 1) return ERROR;
+
+  unsigned short pin = atoi(argv[0]);
   short value;
 
-  if(argc < 1)
-  {
+  if (IS_ERROR(PinControlAnalogRead(pin, &value))) {
     return ERROR;
   }
 
-  pin_num = atoi(argv[0]);
-
-  value = analogRead(pin_num);
-
   Serial.println(value);
-
   return SUCCESS;
 }

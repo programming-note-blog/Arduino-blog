@@ -12,6 +12,7 @@
 				//追加のソースコード
 				"arduino/command.cpp",
                 "arduino/serial.cpp",
+                "arduino/pin_control.cpp",
 				//dmyコード
 				"Sim/dmy_Serial.cpp",
 				"Sim/dmy_Arduino.cpp",
