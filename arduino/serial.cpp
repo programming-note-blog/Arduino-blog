@@ -3,6 +3,7 @@
 #include "serial.h"
 #include "command.h"
 
+#define BIT_RATE 9600
 #define READ_BUFFER_SIZE 64
 #define ARGC_MAX 8
 
@@ -20,6 +21,10 @@ static unsigned short get_arg(char* line, char** argv);
 void SerialInit(void)
 {
   pReadBufferEnd = &ReadBuffer[0];
+
+  Serial.begin(BIT_RATE);
+  Serial.println("Hello World");
+  Serial.print("> ");
 }
 
 
