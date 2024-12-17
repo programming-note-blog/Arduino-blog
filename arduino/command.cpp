@@ -2,6 +2,7 @@
 
 #include "command.h"
 #include "pin_control.h"
+#include "motor_control.h"
 
 #ifdef SUCCESS
 #undef SUCCESS
@@ -21,6 +22,9 @@ static unsigned short cmd_dw(unsigned short argc, char** argv);
 static unsigned short cmd_dr(unsigned short argc, char** argv);
 static unsigned short cmd_aw(unsigned short argc, char** argv);
 static unsigned short cmd_ar(unsigned short argc, char** argv);
+static unsigned short cmd_motor_set_right(unsigned short argc, char** argv);
+static unsigned short cmd_motor_set_left(unsigned short argc, char** argv);
+static unsigned short cmd_motor_stop(unsigned short argc, char** argv);
 
 typedef struct tCommand
 {
@@ -36,6 +40,9 @@ static const SCommand COMMAND_TABLE[] =                           // コマン�
   {"dr",   cmd_dr,   "dr <pin>              :digitalRead(pin)"},
   {"aw",   cmd_aw,   "aw <pin> <dec>        :analogWrite(pin,dec)"},
   {"ar",   cmd_ar,   "ar <pin>              :analogRead(pin)"},
+  {"motor_set_right", cmd_motor_set_right, "motor_set_right <speed> :Set right motor speed (-255 to 255)"},
+  {"motor_set_left",  cmd_motor_set_left,  "motor_set_left <speed>  :Set left motor speed (-255 to 255)"},
+  {"motor_stop", cmd_motor_stop, "motor_stop            :Stop both motors"},
 };
 
 void CommandExecute(unsigned short argc, char** argv)
@@ -132,5 +139,23 @@ static unsigned short cmd_ar(unsigned short argc, char** argv) {
   }
 
   Serial.println(value);
+  return SUCCESS;
+}
+
+static unsigned short cmd_motor_set_right(unsigned short argc, char** argv) {
+  if (argc < 1) return ERROR;
+  short speed = atoi(argv[0]);
+  return MotorControlSetRightMotorSpeed(speed);
+}
+
+static unsigned short cmd_motor_set_left(unsigned short argc, char** argv) {
+  if (argc < 1) return ERROR;
+  short speed = atoi(argv[0]);
+  return MotorControlSetLeftMotorSpeed(speed);
+}
+
+static unsigned short cmd_motor_stop(unsigned short argc, char** argv) {
+  MotorControlStopRightMotor();
+  MotorControlStopLeftMotor();
   return SUCCESS;
 }
