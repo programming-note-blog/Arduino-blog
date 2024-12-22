@@ -1,6 +1,13 @@
-/* pin_control.cpp */
 #include <Arduino.h>
 #include "pin_control.h"
+
+unsigned short PinControlSetMode(unsigned short pin, unsigned short mode) {
+  if (mode != INPUT && mode != INPUT_PULLUP && mode != OUTPUT) {
+    return 1; // Error: Invalid mode
+  }
+  pinMode(pin, (PinMode)mode);
+  return 0; // Success
+}
 
 unsigned short PinControlDigitalWrite(unsigned short pin, unsigned short value) {
   if (value != LOW && value != HIGH) {

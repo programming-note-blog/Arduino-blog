@@ -1,56 +1,65 @@
-/* button_control.cpp */
 #include <Arduino.h>
 #include "button_control.h"
+#include "pin_control.h" // ピン制御モジュールをインクルード
 
-#define DEBOUNCE_DELAY 50 // Debounce delay in milliseconds
+#define DEBOUNCE_DELAY 50 // デバウンス遅延 (ms)
 
-// Button debounce state management structure
+// ボタン状態管理構造体
 struct ButtonState {
-  unsigned long lastDebounceTime;  // Timestamp for debounce handling
-  bool lastStableState;           // Last stable state (HIGH/LOW)
-  bool currentState;              // Current input state
-  ButtonCallback callback;        // Callback function for button press
+  unsigned long lastDebounceTime;  // デバウンスのタイムスタンプ
+  bool lastStableState;           // 安定した最後の状態 (HIGH/LOW)
+  bool currentState;              // 現在の読み取り状態
+  ButtonCallback callback;        // ボタンが押されたときのコールバック
 };
 
-// Array to manage button states for up to 20 pins
+// 最大20個のピンのボタン状態を管理
 static ButtonState buttonStates[20];
 
 unsigned short ButtonInit(unsigned short pin, ButtonCallback callback) {
-  pinMode(pin, INPUT_PULLUP); // Set button as input with pull-up mode
+  // ピンモードを INPUT_PULLUP に設定
+  if (PinControlSetMode(pin, INPUT_PULLUP) != 0) {
+    return 1; // エラー
+  }
+
+  // ボタン状態初期化
   buttonStates[pin].lastDebounceTime = 0;
-  buttonStates[pin].lastStableState = HIGH; // Default state is HIGH (not pressed)
+  buttonStates[pin].lastStableState = HIGH; // 初期状態は HIGH（未押下）
   buttonStates[pin].currentState = HIGH;
-  buttonStates[pin].callback = callback; // Register callback function
+  buttonStates[pin].callback = callback;
+
   return 0;
 }
 
 unsigned short ButtonRead(void) {
   for (unsigned short pin = 0; pin < 20; pin++) {
     if (buttonStates[pin].callback == nullptr) {
-      continue; // Skip pins without registered callbacks
+      continue; // コールバックが登録されていないピンはスキップ
     }
 
-    // Read the current button state
-    bool reading = digitalRead(pin);
+    // 現在のピンの状態を読み取る
+    short reading;
+    if (PinControlDigitalRead(pin, &reading) != 0) {
+      return 1; // エラー
+    }
 
-    // Debounce handling
+    // 状態が変化したらデバウンス処理をリセット
     if (reading != buttonStates[pin].currentState) {
-      buttonStates[pin].lastDebounceTime = millis(); // Record timestamp
+      buttonStates[pin].lastDebounceTime = millis();
+      buttonStates[pin].currentState = reading; // 状態を即時更新
     }
 
-    // Update stable state after debounce delay
+    // デバウンス遅延後に安定した状態を確認
     if ((millis() - buttonStates[pin].lastDebounceTime) > DEBOUNCE_DELAY) {
+      // 安定状態が変化した場合
       if (reading != buttonStates[pin].lastStableState) {
-        buttonStates[pin].lastStableState = reading; // Update stable state
+        buttonStates[pin].lastStableState = reading; // 安定状態を更新
 
-        // Trigger callback on button press
+        // ボタンが押された場合（LOW に遷移）
         if (reading == LOW && buttonStates[pin].callback != nullptr) {
-          buttonStates[pin].callback();
+          buttonStates[pin].callback(); // コールバックを呼び出す
         }
       }
     }
-
-    buttonStates[pin].currentState = reading; // Update current state
   }
   return 0;
 }
