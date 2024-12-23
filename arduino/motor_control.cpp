@@ -1,4 +1,3 @@
-#include <Arduino.h>
 #include "motor_control.h"
 #include "pin_control.h"
 
@@ -9,10 +8,7 @@ static unsigned short leftMotorPins[2] = {9, 10}; // Pins for the left motor
 
 unsigned short MotorControlInit() {
   for (unsigned short i = 0; i < 2; i++) {
-    pinMode(rightMotorPins[i], OUTPUT);
     PinControlAnalogWrite(rightMotorPins[i], 0); // Initialize with 0 duty cycle
-
-    pinMode(leftMotorPins[i], OUTPUT);
     PinControlAnalogWrite(leftMotorPins[i], 0); // Initialize with 0 duty cycle
   }
   return 0; // Success
