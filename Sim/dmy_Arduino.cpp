@@ -111,7 +111,7 @@ void digitalWrite(pin_size_t pinNumber, PinStatus status) {
 
     g_PinList[pinNumber].Value = (status == HIGH) ? 1023 : 0;
     g_PinList[pinNumber].isAnalogWrite = false; // デジタルライトとして扱う
-    std::cout << "Pin " << g_PinList[pinNumber].Name << " set to " << (status == HIGH ? "HIGH" : "LOW") << std::endl;
+    //std::cout << "Pin " << g_PinList[pinNumber].Name << " set to " << (status == HIGH ? "HIGH" : "LOW") << std::endl;
 }
 
 // アナログライト
