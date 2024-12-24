@@ -15,6 +15,7 @@
                 "arduino/pin_control.cpp",
                 "arduino/button_control.cpp",
                 "arduino/motor_control.cpp",
+                "arduino/led_control.cpp",
 				//dmyコード
 				"Sim/dmy_Serial.cpp",
 				"Sim/dmy_Arduino.cpp",
