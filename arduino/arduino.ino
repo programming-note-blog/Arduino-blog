@@ -12,7 +12,7 @@
 void onButtonPress() {
   Serial.println("Button Pressed!");
 
-  LEDOff(4);
+  LEDOneShot(4, 100);
 }
 
 void setup()
@@ -24,11 +24,7 @@ void setup()
 
   MotorControlInit();
 
-  LEDInit(LED_PIN);       // LEDの初期化
   LEDBlink(LED_PIN, 500); // 500ms間隔で点滅
-
-  LEDInit(4);       // LEDの初期化
-  LEDBlink(4, 500); // 500ms間隔で点滅
 }
 
 void loop()
