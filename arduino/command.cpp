@@ -3,6 +3,7 @@
 #include "command.h"
 #include "pin_control.h"
 #include "motor_control.h"
+#include "led_control.h"
 
 #ifdef SUCCESS
 #undef SUCCESS
@@ -22,9 +23,8 @@ static unsigned short cmd_dw(unsigned short argc, char** argv);
 static unsigned short cmd_dr(unsigned short argc, char** argv);
 static unsigned short cmd_aw(unsigned short argc, char** argv);
 static unsigned short cmd_ar(unsigned short argc, char** argv);
-static unsigned short cmd_motor_set_right(unsigned short argc, char** argv);
-static unsigned short cmd_motor_set_left(unsigned short argc, char** argv);
-static unsigned short cmd_motor_stop(unsigned short argc, char** argv);
+static unsigned short cmd_motor(unsigned short argc, char** argv);
+static unsigned short cmd_led(unsigned short argc, char** argv);
 
 typedef struct tCommand
 {
@@ -40,9 +40,8 @@ static const SCommand COMMAND_TABLE[] =                           // コマン�
   {"dr",   cmd_dr,   "dr <pin>              :digitalRead(pin)"},
   {"aw",   cmd_aw,   "aw <pin> <dec>        :analogWrite(pin,dec)"},
   {"ar",   cmd_ar,   "ar <pin>              :analogRead(pin)"},
-  {"motor_set_right", cmd_motor_set_right, "motor_set_right <speed> :Set right motor speed (-255 to 255)"},
-  {"motor_set_left",  cmd_motor_set_left,  "motor_set_left <speed>  :Set left motor speed (-255 to 255)"},
-  {"motor_stop", cmd_motor_stop, "motor_stop            :Stop both motors"},
+  {"motor",cmd_motor,"motor                 :motor control commands"},
+  {"led",  cmd_led,  "led                   :led control commands"},
 };
 
 void CommandExecute(unsigned short argc, char** argv)
@@ -142,6 +141,56 @@ static unsigned short cmd_ar(unsigned short argc, char** argv) {
   return SUCCESS;
 }
 
+
+
+
+static unsigned short cmd_motor_set_right(unsigned short argc, char** argv);
+static unsigned short cmd_motor_set_left(unsigned short argc, char** argv);
+static unsigned short cmd_motor_stop(unsigned short argc, char** argv);
+static const SCommand COMMAND_MOTOR_TABLE[] =                           // コマンドテーブル
+{
+  {"r", cmd_motor_set_right, "motor r <speed> :Set right motor speed (-255 to 255)"},
+  {"l",  cmd_motor_set_left, "motor l <speed> :Set left motor speed (-255 to 255)"},
+  {"s", cmd_motor_stop,      "motor s         :Stop both motors"},
+};
+
+static unsigned short cmd_motor(unsigned short argc, char** argv)
+{
+  unsigned short i;
+  unsigned short result;
+
+  if (argc == 0)
+	{
+    for(i = 0; i < (sizeof(COMMAND_MOTOR_TABLE) / sizeof(SCommand)); i++)
+    {
+      Serial.println(COMMAND_MOTOR_TABLE[i].usage);
+    }
+
+    return SUCCESS;
+	}
+
+  for(i = 0; i < (sizeof(COMMAND_MOTOR_TABLE) / sizeof(SCommand)); i++)
+  {
+    if(!strcmp(COMMAND_MOTOR_TABLE[i].key, argv[0]))
+    {
+      result = COMMAND_MOTOR_TABLE[i].func(argc - 1, &argv[1]);
+      if(IS_ERROR(result))
+      {
+        Serial.println(COMMAND_MOTOR_TABLE[i].usage);
+      }
+      return SUCCESS;
+    }
+  }
+
+  Serial.println("[error] Unknown command. Available commands:");
+  for(i = 0; i < (sizeof(COMMAND_MOTOR_TABLE) / sizeof(SCommand)); i++)
+  {
+    Serial.println(COMMAND_MOTOR_TABLE[i].usage);
+  }
+
+  return SUCCESS;
+}
+
 static unsigned short cmd_motor_set_right(unsigned short argc, char** argv) {
   if (argc < 1) return ERROR;
   short speed = atoi(argv[0]);
@@ -158,4 +207,56 @@ static unsigned short cmd_motor_stop(unsigned short argc, char** argv) {
   MotorControlStopRightMotor();
   MotorControlStopLeftMotor();
   return SUCCESS;
+}
+
+static unsigned short cmd_led_oneshot(unsigned short argc, char** argv);
+static const SCommand COMMAND_LED_TABLE[] =                           // コマンドテーブル
+{
+  {"oneshot", cmd_led_oneshot, "oneshot <pin> <ms>            :display prm"},
+};
+static unsigned short cmd_led(unsigned short argc, char** argv)
+{
+  unsigned short i;
+  unsigned short result;
+
+  if (argc == 0)
+	{
+    for(i = 0; i < (sizeof(COMMAND_LED_TABLE) / sizeof(SCommand)); i++)
+    {
+      Serial.println(COMMAND_LED_TABLE[i].usage);
+    }
+
+    return SUCCESS;
+	}
+
+  for(i = 0; i < (sizeof(COMMAND_LED_TABLE) / sizeof(SCommand)); i++)
+  {
+    if(!strcmp(COMMAND_LED_TABLE[i].key, argv[0]))
+    {
+      result = COMMAND_LED_TABLE[i].func(argc - 1, &argv[1]);
+      if(IS_ERROR(result))
+      {
+        Serial.println(COMMAND_LED_TABLE[i].usage);
+      }
+      return SUCCESS;
+    }
+  }
+
+  Serial.println("[error] Unknown command. Available commands:");
+  for(i = 0; i < (sizeof(COMMAND_LED_TABLE) / sizeof(SCommand)); i++)
+  {
+    Serial.println(COMMAND_LED_TABLE[i].usage);
+  }
+
+  return SUCCESS;
+}
+
+static unsigned short cmd_led_oneshot(unsigned short argc, char** argv)
+{
+  if (argc < 2) return ERROR;
+
+  unsigned short pin = atoi(argv[0]);
+  unsigned short duration = atoi(argv[1]);
+
+  return LEDOneShot(pin, duration);
 }

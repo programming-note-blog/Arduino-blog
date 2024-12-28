@@ -3,8 +3,8 @@
 
 #define PWM_RESOLUTION 255 // Default PWM resolution
 
-static unsigned short rightMotorPins[2] = {5, 6}; // Pins for the right motor
-static unsigned short leftMotorPins[2] = {9, 10}; // Pins for the left motor
+static unsigned short rightMotorPins[2] = {PIN_R_MOTOR_1, PIN_R_MOTOR_2}; // Pins for the right motor
+static unsigned short leftMotorPins[2] = {PIN_L_MOTOR_1, PIN_L_MOTOR_2}; // Pins for the left motor
 
 unsigned short MotorControlInit() {
   for (unsigned short i = 0; i < 2; i++) {

@@ -6,24 +6,21 @@
 #include "motor_control.h"
 #include "led_control.h"
 
-#define LED_PIN 13
-
 // ボタンが押されたときの処理(仮)
 void onButtonPress() {
   Serial.println("Button Pressed!");
+
+  LEDOneShot(PIN_BUZZER, 100);
 }
 
 void setup()
 {
   SerialInit();
-
-  // ボタン用ピンの初期化（7番ピンにコールバックを登録）
-  ButtonInit(7, onButtonPress);
-
+  ButtonInit(PIN_BUTTON, onButtonPress);
   MotorControlInit();
+  LEDBlink(PIN_LED, 500); // 500ms間隔で点滅
 
-  LEDInit(LED_PIN);       // LEDの初期化
-  LEDBlink(LED_PIN, 500); // 500ms間隔で点滅
+  LEDPattern(PIN_BUZZER); // 起動時にピピと鳴らす
 }
 
 void loop()
