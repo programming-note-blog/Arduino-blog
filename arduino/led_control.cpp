@@ -1,6 +1,6 @@
 #include "Arduino.h"
 #include "led_control.h"
-#include "pin_control.h" // ピン制御モジュールをインクルード
+#include "pin_control.h"
 
 // LED管理用構造体
 struct LEDState {

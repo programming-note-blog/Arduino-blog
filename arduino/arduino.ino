@@ -20,7 +20,7 @@ void setup()
   MotorControlInit();
   LEDBlink(PIN_LED, 500); // 500ms間隔で点滅
 
-  LEDPattern(PIN_BUZZER); // ピピ
+  LEDPattern(PIN_BUZZER); // 起動時にピピと鳴らす
 }
 
 void loop()
