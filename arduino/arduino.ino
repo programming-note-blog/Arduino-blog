@@ -19,6 +19,8 @@ void setup()
   ButtonInit(PIN_BUTTON, onButtonPress);
   MotorControlInit();
   LEDBlink(PIN_LED, 500); // 500ms間隔で点滅
+
+  LEDPattern(PIN_BUZZER); // ピピ
 }
 
 void loop()
