@@ -6,12 +6,6 @@
 #ifndef SENSOR_CONTROL_H
 #define SENSOR_CONTROL_H
 
-#include <stdint.h> // 標準データ型を使用するためにインクルード
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 /**
  * @brief センサモジュールを初期化します。
  * @return 0 成功
@@ -41,9 +35,5 @@ unsigned short SensorControlUpdateThresholds();
  * @return unsigned char 黒色検出のバイナリ値
  */
 unsigned char SensorControlGetBinaryOutput();
-
-#ifdef __cplusplus
-}
-#endif
 
 #endif // SENSOR_CONTROL_H
