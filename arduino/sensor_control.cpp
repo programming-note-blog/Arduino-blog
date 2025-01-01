@@ -5,6 +5,7 @@
 
 #include "sensor_control.h"
 #include "pin_control.h"
+#include "led_control.h"
 
 #define NUM_SENSORS 8 // センサの数
 #define CALIBRATION_SAMPLES 8 // キャリブレーションのサンプル数
@@ -18,13 +19,13 @@ static unsigned short thresholds[NUM_SENSORS]; // 検出用のしきい値
  * @brief センサモジュールを初期化します。
  * @return 0 成功
  */
-unsigned short SensorControlInit() {
+unsigned short SensorControlInit(unsigned short pin) {
     for (unsigned short i = 0; i < NUM_SENSORS; i++) {
         whiteCalibrated[i] = 0;
         blackCalibrated[i] = 1023;
         thresholds[i] = 512; // デフォルトの中間値
     }
-    return 0; // 成功
+    return LEDOn(pin);
 }
 
 /**

@@ -16,7 +16,7 @@ extern "C" {
  * @brief センサモジュールを初期化します。
  * @return 0 成功
  */
-unsigned short SensorControlInit();
+unsigned short SensorControlInit(unsigned short pin);
 
 /**
  * @brief 白色表面のキャリブレーションを実行します。

@@ -35,9 +35,7 @@ void setup()
   ButtonInit(PIN_BUTTON_B, onButtonPress2);
   ButtonInit(PIN_BUTTON_G, onButtonPress);
   MotorControlInit();
-
-  SensorControlInit();
-  LEDOn(PIN_SENSOR_LEDON);
+  SensorControlInit(PIN_SENSOR_LEDON);
 
   LEDPattern(PIN_BUZZER); // 起動時にピピと鳴らす
 }
