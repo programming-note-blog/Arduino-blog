@@ -131,13 +131,9 @@ static unsigned short cmd_ar(unsigned short argc, char** argv) {
   if (argc < 1) return ERROR;
 
   unsigned short pin = atoi(argv[0]);
-  short value;
 
-  if (IS_ERROR(PinControlAnalogRead(pin, &value))) {
-    return ERROR;
-  }
-
-  Serial.println(value);
+  Serial.println(PinControlAnalogRead(pin));
+  
   return SUCCESS;
 }
 
