@@ -4,10 +4,12 @@
 #define PIN_BUZZER 4
 #define PIN_R_MOTOR_1 5
 #define PIN_R_MOTOR_2 6
-#define PIN_BUTTON 7
+#define PIN_BUTTON_B 7
+#define PIN_BUTTON_W 8
 #define PIN_L_MOTOR_1 9
 #define PIN_L_MOTOR_2 10
-#define PIN_LED 13
+#define PIN_BUTTON_G 11
+#define PIN_SENSOR_LEDON 13
 #define PIN_SENSOR_0 14
 #define PIN_SENSOR_1 15
 #define PIN_SENSOR_2 16

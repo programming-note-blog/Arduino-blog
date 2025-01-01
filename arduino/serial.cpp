@@ -51,7 +51,7 @@ void SerialRead(void)
     *pReadBufferEnd = '\0';
 
     ArgC = get_arg(&ReadBuffer[0], ArgV);
-    CommandExecute(ArgC, ArgV);
+    CommandExecute(ArgC, (const char**)ArgV);
 
     pReadBufferEnd = &ReadBuffer[0];
 
