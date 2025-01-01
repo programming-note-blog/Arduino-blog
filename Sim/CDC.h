@@ -22,6 +22,11 @@
 #error Please lower the CDC Buffer size
 #endif
 
+#define DEC 10
+#define HEX 16
+#define OCT 8
+#define BIN 2
+
 class Serial_// : public Stream
 {
 private:
@@ -41,6 +46,7 @@ public:
 	size_t println(unsigned int);
 	size_t print(unsigned long);
 	size_t println(unsigned long);
+	size_t println(unsigned char b, int base);
 
 	/* Stream */
 

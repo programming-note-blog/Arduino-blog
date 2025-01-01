@@ -4,6 +4,7 @@
 #include "pin_control.h"
 #include "motor_control.h"
 #include "led_control.h"
+#include "sensor_control.h"
 
 #ifdef SUCCESS
 #undef SUCCESS
@@ -25,6 +26,7 @@ static unsigned short cmd_aw(unsigned short argc, char** argv);
 static unsigned short cmd_ar(unsigned short argc, char** argv);
 static unsigned short cmd_motor(unsigned short argc, char** argv);
 static unsigned short cmd_led(unsigned short argc, char** argv);
+static unsigned short cmd_sensor(unsigned short argc, char** argv);
 
 typedef struct tCommand
 {
@@ -42,6 +44,7 @@ static const SCommand COMMAND_TABLE[] =                           // コマン�
   {"ar",   cmd_ar,   "ar <pin>              :analogRead(pin)"},
   {"motor",cmd_motor,"motor                 :motor control commands"},
   {"led",  cmd_led,  "led                   :led control commands"},
+  {"sensor", cmd_sensor, "sensor                :sensor control commands"},
 };
 
 void CommandExecute(unsigned short argc, char** argv)
@@ -136,9 +139,6 @@ static unsigned short cmd_ar(unsigned short argc, char** argv) {
   
   return SUCCESS;
 }
-
-
-
 
 static unsigned short cmd_motor_set_right(unsigned short argc, char** argv);
 static unsigned short cmd_motor_set_left(unsigned short argc, char** argv);
@@ -255,4 +255,75 @@ static unsigned short cmd_led_oneshot(unsigned short argc, char** argv)
   unsigned short duration = atoi(argv[1]);
 
   return LEDOneShot(pin, duration);
+}
+
+static unsigned short cmd_sensor_calibrate_white(unsigned short argc, char** argv);
+static unsigned short cmd_sensor_calibrate_black(unsigned short argc, char** argv);
+static unsigned short cmd_sensor_update_thresholds(unsigned short argc, char** argv);
+static unsigned short cmd_sensor_get_binary_output(unsigned short argc, char** argv);
+
+static const SCommand COMMAND_SENSOR_TABLE[] =
+{
+  {"w", cmd_sensor_calibrate_white, "sensor w   :Calibrate white surface"},
+  {"b", cmd_sensor_calibrate_black, "sensor b   :Calibrate black surface"},
+  {"u", cmd_sensor_update_thresholds, "sensor u   :Update detection thresholds"},
+  {"get", cmd_sensor_get_binary_output, "sensor get :Get binary output"},
+};
+
+static unsigned short cmd_sensor(unsigned short argc, char** argv)
+{
+  unsigned short i;
+  unsigned short result;
+
+  if (argc == 0)
+  {
+    for (i = 0; i < (sizeof(COMMAND_SENSOR_TABLE) / sizeof(SCommand)); i++)
+    {
+      Serial.println(COMMAND_SENSOR_TABLE[i].usage);
+    }
+    return SUCCESS;
+  }
+
+  for (i = 0; i < (sizeof(COMMAND_SENSOR_TABLE) / sizeof(SCommand)); i++)
+  {
+    if (!strcmp(COMMAND_SENSOR_TABLE[i].key, argv[0]))
+    {
+      result = COMMAND_SENSOR_TABLE[i].func(argc - 1, &argv[1]);
+      if (IS_ERROR(result))
+      {
+        Serial.println(COMMAND_SENSOR_TABLE[i].usage);
+      }
+      return SUCCESS;
+    }
+  }
+
+  Serial.println("[error] Unknown command. Available commands:");
+  for (i = 0; i < (sizeof(COMMAND_SENSOR_TABLE) / sizeof(SCommand)); i++)
+  {
+    Serial.println(COMMAND_SENSOR_TABLE[i].usage);
+  }
+
+  return SUCCESS;
+}
+
+static unsigned short cmd_sensor_calibrate_white(unsigned short argc, char** argv)
+{
+  return SensorControlCalibrateWhite();
+}
+
+static unsigned short cmd_sensor_calibrate_black(unsigned short argc, char** argv)
+{
+  return SensorControlCalibrateBlack();
+}
+
+static unsigned short cmd_sensor_update_thresholds(unsigned short argc, char** argv)
+{
+  return SensorControlUpdateThresholds();
+}
+
+static unsigned short cmd_sensor_get_binary_output(unsigned short argc, char** argv)
+{
+  unsigned char binaryOutput = SensorControlGetBinaryOutput();
+  Serial.println(binaryOutput, BIN);
+  return SUCCESS;
 }
