@@ -90,13 +90,10 @@ unsigned short PinControlAnalogWrite(unsigned short pin, unsigned short value) {
   return 0; // Success
 }
 
-unsigned short PinControlAnalogRead(unsigned short pin, short* value) {
+unsigned short PinControlAnalogRead(unsigned short pin) {
   if (pin >= MAX_PIN_COUNT) {
     return 1; // Error: Pin out of range
   }
-  if (value == nullptr) {
-    return 1; // Error: Null pointer
-  }
-  *value = analogRead(pin);
-  return 0; // Success
+
+  return analogRead(pin); // Success
 }

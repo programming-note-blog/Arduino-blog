@@ -30,6 +30,17 @@ size_t Serial_::println(const char Char)
 {
 	return printf("%d",Char) + printf("\n");
 }
+
+size_t Serial_::println(unsigned char value, int base)
+{
+	if (base == 2)
+	{
+		return printf("%c%c%c%c%c%c%c%c\n", value & 128 ? '1' : '0', value & 64 ? '1' : '0', value & 32 ? '1' : '0', value & 16 ? '1' : '0', value & 8 ? '1' : '0', value & 4 ? '1' : '0', value & 2 ? '1' : '0', value & 1 ? '1' : '0');
+	}
+	//TODO:バイナリ以外の形式
+	return 0;
+}
+
 // コンパイラによっては出力されない
 size_t Serial_::print(const char* str)
 {
