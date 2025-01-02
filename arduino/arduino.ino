@@ -65,12 +65,12 @@ void setup()
   CycleSetFunc(UpdateCurrentState, STATE_STANDBY, 0);
   // STATE_LINETRACINGの周期処理設定
   CycleSetFunc(UpdateCurrentState, STATE_LINETRACING, 0); 
-  CycleSetFunc(Func1, STATE_LINETRACING, 0); // センサー情報取得
+  CycleSetFunc(Func1, STATE_LINETRACING, 1); // センサー情報取得
   CycleSetFunc(Func2, STATE_LINETRACING, 5); // 制御値算出
   CycleSetFunc(Func3, STATE_LINETRACING, 7); // 制御値設定
 
   // STATE_STOPPEDの周期処理設定
-  CycleSetFunc(UpdateCurrentState, STATE_STOPPED, 0); 
+  CycleSetFunc(UpdateCurrentState, STATE_STOPPED, 0);
   CycleSetFunc(Func4, STATE_STOPPED, 0); // アラーム鳴らす
 
   LEDPattern(PIN_BUZZER); // 起動時にピピと鳴らす
