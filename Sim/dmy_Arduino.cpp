@@ -163,7 +163,7 @@ int analogRead(pin_size_t pinNumber) {
 }
 
 unsigned long millis(void) {
-    return clock();
+    return clock()/10;
 }
 
 std::mt19937 gen;

@@ -17,6 +17,8 @@
                 "arduino/motor_control.cpp",
                 "arduino/led_control.cpp",
                 "arduino/sensor_control.cpp",
+                "arduino/cycle.cpp",
+                "arduino/state.cpp",
 				//dmyコード
 				"Sim/dmy_Serial.cpp",
 				"Sim/dmy_Arduino.cpp",
