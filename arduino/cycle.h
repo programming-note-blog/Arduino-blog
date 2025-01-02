@@ -1,7 +1,7 @@
 #ifndef CYCLE_H
 #define CYCLE_H
 
-#define PERIODIC_INTERVAL 10 // ms
+#define PERIODIC_INTERVAL 20 // ms
 
 #include "state.h"
 

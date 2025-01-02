@@ -26,14 +26,14 @@ void StateOnButtonPress() {
     switch(currentState) {
         case STATE_STANDBY:
             currentState = STATE_LINETRACING;
-            printf("Standby -> LineTracing\n");
+            Serial.println("Standby -> LineTracing\n");
             moveFunctionOn = true;
             endoscopeLockOn = true;
             alertOn = true;
             break;
         case STATE_LINETRACING:
             currentState = STATE_STANDBY;
-            printf("LineTracing -> Standby\n");
+            Serial.println("LineTracing -> Standby\n");
             moveFunctionOn = false;
             endoscopeLockOn = false;
             alertOn = false;
@@ -41,10 +41,11 @@ void StateOnButtonPress() {
         case STATE_STOPPED:
             if(isEndoscopeChecked()) {
                 currentState = STATE_STANDBY;
-                printf("Stopped -> Standby\n");
+                Serial.println("Stopped -> Standby\n");
                 forgetAlertOn = false;
             } else {
-              printf("[error]%d\n",currentState);
+              Serial.print("[error]");
+              Serial.println(currentState);
             }
             break;
     }
@@ -53,7 +54,7 @@ void StateOnButtonPress() {
 void StateOnArrive(void) {
     if(currentState == STATE_LINETRACING) {
         currentState = STATE_STOPPED;
-        printf("LineTracing -> Stopped\n");
+        Serial.println("LineTracing -> Stopped\n");
         moveFunctionOn = false;
         endoscopeLockOn = false;
         alertOn = false;
@@ -61,7 +62,8 @@ void StateOnArrive(void) {
     }
 	else
 	{
-		printf("[error]%d\n",currentState);
+        Serial.print("[error]");
+        Serial.println(currentState);
 	}
 }
 
