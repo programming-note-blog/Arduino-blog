@@ -8,69 +8,66 @@
 #define ARGC_MAX 8
 
 #define IS_TERMINATION(c) ((c) == '\r' || (c) == '\n' || (c) == '\0')
-#define IS_SPACE(c)       ((c) == ' ')
+#define IS_SPACE(c) ((c) == ' ')
 
 static char ReadBuffer[READ_BUFFER_SIZE];
-static char* pReadBufferEnd;
+static char *pReadBufferEnd;
 static unsigned short ArgC;
-static char* ArgV[ARGC_MAX];
+static char *ArgV[ARGC_MAX];
 
-static unsigned short get_arg(char* line, char** argv);
-
+static unsigned short get_arg(char *line, char **argv);
 
 void SerialSetup(void)
 {
-  pReadBufferEnd = &ReadBuffer[0];
+	pReadBufferEnd = &ReadBuffer[0];
 
-  Serial.begin(BIT_RATE);
-  Serial.println("Hello World");
-  Serial.print("> ");
+	Serial.begin(BIT_RATE);
+	Serial.println("Hello World");
+	Serial.print("> ");
 }
-
 
 void SerialLoop(void)
 {
-  if(Serial.available() <= 0)
-  {
-    return;
-  }
+	if (Serial.available() <= 0)
+	{
+		return;
+	}
 
-  if(pReadBufferEnd == &ReadBuffer[READ_BUFFER_SIZE])
-  {
-    ReadBuffer[READ_BUFFER_SIZE - 1] = '\0';
-  }
-  else
-  {
-    *pReadBufferEnd = (char)Serial.read();
-  }
+	if (pReadBufferEnd == &ReadBuffer[READ_BUFFER_SIZE])
+	{
+		ReadBuffer[READ_BUFFER_SIZE - 1] = '\0';
+	}
+	else
+	{
+		*pReadBufferEnd = (char)Serial.read();
+	}
 
-  if(IS_TERMINATION(*pReadBufferEnd))
-  {
-    Serial.println();
-    
-    *pReadBufferEnd = '\0';
+	if (IS_TERMINATION(*pReadBufferEnd))
+	{
+		Serial.println();
 
-    ArgC = get_arg(&ReadBuffer[0], ArgV);
-    CommandExecute(ArgC, (const char**)ArgV);
+		*pReadBufferEnd = '\0';
 
-    pReadBufferEnd = &ReadBuffer[0];
+		ArgC = get_arg(&ReadBuffer[0], ArgV);
+		CommandExecute(ArgC, (const char **)ArgV);
 
-    Serial.print("> ");
+		pReadBufferEnd = &ReadBuffer[0];
 
-    return;
-  }
+		Serial.print("> ");
 
-  pReadBufferEnd++;
+		return;
+	}
+
+	pReadBufferEnd++;
 }
 
-
-static unsigned short get_arg(char* line, char** argv)
+static unsigned short get_arg(char *line, char **argv)
 {
-  unsigned short i;
-  unsigned short argc = 0;
+	unsigned short i;
+	unsigned short argc = 0;
 
 	// 1文字目
-	if(IS_SPACE(line[0]) || IS_TERMINATION(line[0]))
+	if (IS_SPACE(line[0]) || IS_TERMINATION(line[0]))
 	{
 		return argc;
 	}
@@ -80,33 +77,33 @@ static unsigned short get_arg(char* line, char** argv)
 		argc++;
 	}
 
-  // 2文字目以降
-  for(i = 1; i < READ_BUFFER_SIZE; i++)
-  {
-    if(IS_TERMINATION(line[i]))
-    {
-      line[i] = '\0';
-      return argc;
-    }
+	// 2文字目以降
+	for (i = 1; i < READ_BUFFER_SIZE; i++)
+	{
+		if (IS_TERMINATION(line[i]))
+		{
+			line[i] = '\0';
+			return argc;
+		}
 
-    if(IS_SPACE(line[i]))
-    {
-      line[i] = '\0';
-      continue;
-    }
+		if (IS_SPACE(line[i]))
+		{
+			line[i] = '\0';
+			continue;
+		}
 
-    if(IS_TERMINATION(line[i - 1]))
-    {
-      argv[argc] = &line[i];
-      argc++;
+		if (IS_TERMINATION(line[i - 1]))
+		{
+			argv[argc] = &line[i];
+			argc++;
 
-      if(argc == ARGC_MAX)
-      {
-        return ARGC_MAX - 1;
-      }
-    }
-  }
+			if (argc == ARGC_MAX)
+			{
+				return ARGC_MAX - 1;
+			}
+		}
+	}
 
-  Serial.println("[error]line without end");
-  return 0;
+	Serial.println("[error]line without end");
+	return 0;
 }

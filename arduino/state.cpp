@@ -17,57 +17,66 @@ static bool forgetAlertOn = false;
 static bool isEndoscopeChecked();
 
 // 現在の状態を取得する関数
-EState StateGetCurrentstate(void) {
-    return currentState;
+EState StateGetCurrentstate(void)
+{
+	return currentState;
 }
 
-void StateOnButtonPress() {
-    switch(currentState) {
-        case STATE_STANDBY:
-            currentState = STATE_LINETRACING;
-            Serial.println("Standby -> LineTracing\n");
-            moveFunctionOn = true;
-            endoscopeLockOn = true;
-            alertOn = true;
-            break;
-        case STATE_LINETRACING:
-            currentState = STATE_STANDBY;
-            Serial.println("LineTracing -> Standby\n");
-            moveFunctionOn = false;
-            endoscopeLockOn = false;
-            alertOn = false;
-            break;
-        case STATE_STOPPED:
-            if(isEndoscopeChecked()) {
-                currentState = STATE_STANDBY;
-                Serial.println("Stopped -> Standby\n");
-                forgetAlertOn = false;
-            } else {
-              Serial.print("[error]");
-              Serial.println(currentState);
-            }
-            break;
-    }
-}
-
-void StateOnArrive(void) {
-    if(currentState == STATE_LINETRACING) {
-        currentState = STATE_STOPPED;
-        Serial.println("LineTracing -> Stopped\n");
-        moveFunctionOn = false;
-        endoscopeLockOn = false;
-        alertOn = false;
-        forgetAlertOn = true;
-    }
-	else
+void StateOnButtonPress()
+{
+	switch (currentState)
 	{
-        Serial.print("[error]");
-        Serial.println(currentState);
+	case STATE_STANDBY:
+		currentState = STATE_LINETRACING;
+		Serial.println("Standby -> LineTracing\n");
+		moveFunctionOn = true;
+		endoscopeLockOn = true;
+		alertOn = true;
+		break;
+	case STATE_LINETRACING:
+		currentState = STATE_STANDBY;
+		Serial.println("LineTracing -> Standby\n");
+		moveFunctionOn = false;
+		endoscopeLockOn = false;
+		alertOn = false;
+		break;
+	case STATE_STOPPED:
+		if (isEndoscopeChecked())
+		{
+			currentState = STATE_STANDBY;
+			Serial.println("Stopped -> Standby\n");
+			forgetAlertOn = false;
+		}
+		else
+		{
+			Serial.print("[error]");
+			Serial.println(currentState);
+		}
+		break;
 	}
 }
 
-static bool isEndoscopeChecked() {
-    // この関数は内視鏡が確認されたかどうかの実装を行う。
-    // ここでは常に確認されたものと仮定。
-    return true;
+void StateOnArrive(void)
+{
+	if (currentState == STATE_LINETRACING)
+	{
+		currentState = STATE_STOPPED;
+		Serial.println("LineTracing -> Stopped\n");
+		moveFunctionOn = false;
+		endoscopeLockOn = false;
+		alertOn = false;
+		forgetAlertOn = true;
+	}
+	else
+	{
+		Serial.print("[error]");
+		Serial.println(currentState);
+	}
+}
+
+static bool isEndoscopeChecked()
+{
+	// この関数は内視鏡が確認されたかどうかの実装を行う。
+	// ここでは常に確認されたものと仮定。
+	return true;
 }

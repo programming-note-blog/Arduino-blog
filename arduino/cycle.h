@@ -5,14 +5,7 @@
 
 #include "state.h"
 
-struct SCycleFunc {
-  void (*func)();
-  unsigned long timeAfterStart;
-  bool shouldCall;
-};
-
 void CycleSetup(void (*func)(), EState state, unsigned long timeAfterStart);
-static void CycleReset();
 void CycleLoop();
 void CycleSetState(EState state);
 
