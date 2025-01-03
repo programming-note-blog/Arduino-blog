@@ -11,7 +11,7 @@
 #define NUM_SENSORS 8		  // センサの数
 #define CALIBRATION_SAMPLES 8 // キャリブレーションのサンプル数
 
-static unsigned short sensorPins[NUM_SENSORS] = {PIN_SENSOR_0, PIN_SENSOR_1, PIN_SENSOR_2, PIN_SENSOR_3, PIN_SENSOR_4, PIN_SENSOR_5, PIN_SENSOR_6, PIN_SENSOR_7};
+static Pin sensorPins[NUM_SENSORS] = {PIN_SENSOR_0, PIN_SENSOR_1, PIN_SENSOR_2, PIN_SENSOR_3, PIN_SENSOR_4, PIN_SENSOR_5, PIN_SENSOR_6, PIN_SENSOR_7};
 static unsigned short whiteCalibrated[NUM_SENSORS]; // 白色キャリブレーション値
 static unsigned short blackCalibrated[NUM_SENSORS]; // 黒色キャリブレーション値
 static unsigned short thresholds[NUM_SENSORS];		// 検出用のしきい値

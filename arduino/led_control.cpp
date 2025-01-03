@@ -41,7 +41,7 @@ unsigned short LedOn(unsigned short pin)
 	if (pin >= 20)
 		return 1; // 範囲外のピン番号をチェック
 	InitializeLEDState(pin);
-	if (PinControlDigitalWrite(pin, HIGH) != 0)
+	if (PinControlDigitalWrite((Pin)pin, HIGH) != 0)
 		return 1;							// ピン制御モジュールを使用
 	ledStates[pin].isBlinking = false;		// 点滅を停止
 	ledStates[pin].isOneShot = false;		// 一度だけ点灯も停止
@@ -56,7 +56,7 @@ unsigned short LedOff(unsigned short pin)
 	if (pin >= 20)
 		return 1; // 範囲外のピン番号をチェック
 	InitializeLEDState(pin);
-	if (PinControlDigitalWrite(pin, LOW) != 0)
+	if (PinControlDigitalWrite((Pin)pin, LOW) != 0)
 		return 1;							// ピン制御モジュールを使用
 	ledStates[pin].isBlinking = false;		// 点滅を停止
 	ledStates[pin].isOneShot = false;		// 一度だけ点灯も停止
@@ -85,7 +85,7 @@ unsigned short LedOneShot(unsigned short pin, unsigned long duration)
 	if (pin >= 20)
 		return 1; // 範囲外のピン番号をチェック
 	InitializeLEDState(pin);
-	if (PinControlDigitalWrite(pin, HIGH) != 0)
+	if (PinControlDigitalWrite((Pin)pin, HIGH) != 0)
 		return 1;					   // 点灯
 	ledStates[pin].isBlinking = false; // 点滅を無効化
 	ledStates[pin].isOneShot = true;
@@ -108,7 +108,7 @@ unsigned short LedPattern(unsigned short pin)
 	ledStates[pin].patternStep = 0;
 	ledStates[pin].lastToggleTime = millis();
 	ledStates[pin].currentState = HIGH;
-	if (PinControlDigitalWrite(pin, HIGH) != 0)
+	if (PinControlDigitalWrite((Pin)pin, HIGH) != 0)
 		return 1; // 最初の点灯
 	return 0;
 }
@@ -125,7 +125,7 @@ unsigned short LedLoop(void)
 			{
 				// 点灯/消灯を切り替え
 				ledStates[pin].currentState = !ledStates[pin].currentState;
-				if (PinControlDigitalWrite(pin, ledStates[pin].currentState ? HIGH : LOW) != 0)
+				if (PinControlDigitalWrite((Pin)pin, ledStates[pin].currentState ? HIGH : LOW) != 0)
 				{
 					return 1; // エラー発生時は終了
 				}
@@ -139,7 +139,7 @@ unsigned short LedLoop(void)
 			if (currentTime - ledStates[pin].lastToggleTime >= ledStates[pin].oneShotDuration)
 			{
 				// 一度だけ点灯終了
-				if (PinControlDigitalWrite(pin, LOW) != 0)
+				if (PinControlDigitalWrite((Pin)pin, LOW) != 0)
 					return 1;
 				ledStates[pin].isOneShot = false;
 				ledStates[pin].currentState = LOW;
@@ -154,7 +154,7 @@ unsigned short LedLoop(void)
 			case 0: // 最初の100ms点灯
 				if (currentTime - ledStates[pin].lastToggleTime >= 100)
 				{
-					if (PinControlDigitalWrite(pin, LOW) != 0)
+					if (PinControlDigitalWrite((Pin)pin, LOW) != 0)
 						return 1; // 消灯
 					ledStates[pin].patternStep = 1;
 					ledStates[pin].lastToggleTime = currentTime;
@@ -163,7 +163,7 @@ unsigned short LedLoop(void)
 			case 1: // 50ms消灯
 				if (currentTime - ledStates[pin].lastToggleTime >= 50)
 				{
-					if (PinControlDigitalWrite(pin, HIGH) != 0)
+					if (PinControlDigitalWrite((Pin)pin, HIGH) != 0)
 						return 1; // 点灯
 					ledStates[pin].patternStep = 2;
 					ledStates[pin].lastToggleTime = currentTime;
@@ -172,7 +172,7 @@ unsigned short LedLoop(void)
 			case 2: // 次の100ms点灯
 				if (currentTime - ledStates[pin].lastToggleTime >= 100)
 				{
-					if (PinControlDigitalWrite(pin, LOW) != 0)
+					if (PinControlDigitalWrite((Pin)pin, LOW) != 0)
 						return 1; // 消灯
 					ledStates[pin].patternStep = 3;
 					ledStates[pin].lastToggleTime = currentTime;

@@ -106,7 +106,7 @@ static unsigned short cmd_dw(unsigned short argc, const char **argv)
 	unsigned short pin = atoi(argv[0]);
 	unsigned short value = atoi(argv[1]);
 
-	return PinControlDigitalWrite(pin, value);
+	return PinControlDigitalWrite((Pin)pin, value);
 }
 
 static unsigned short cmd_dr(unsigned short argc, const char **argv)
@@ -117,7 +117,7 @@ static unsigned short cmd_dr(unsigned short argc, const char **argv)
 	unsigned short pin = atoi(argv[0]);
 	short value;
 
-	if (IS_ERROR(PinControlDigitalRead(pin, &value)))
+	if (IS_ERROR(PinControlDigitalRead((Pin)pin, &value)))
 	{
 		return ERROR;
 	}
@@ -134,7 +134,7 @@ static unsigned short cmd_aw(unsigned short argc, const char **argv)
 	unsigned short pin = atoi(argv[0]);
 	unsigned short value = atoi(argv[1]);
 
-	return PinControlAnalogWrite(pin, value);
+	return PinControlAnalogWrite((Pin)pin, value);
 }
 
 static unsigned short cmd_ar(unsigned short argc, const char **argv)
@@ -144,7 +144,7 @@ static unsigned short cmd_ar(unsigned short argc, const char **argv)
 
 	unsigned short pin = atoi(argv[0]);
 
-	Serial.println(PinControlAnalogRead(pin));
+	Serial.println(PinControlAnalogRead((Pin)pin));
 
 	return SUCCESS;
 }
@@ -269,7 +269,7 @@ static unsigned short cmd_led_oneshot(unsigned short argc, const char **argv)
 	unsigned short pin = atoi(argv[0]);
 	unsigned short duration = atoi(argv[1]);
 
-	return LedOneShot(pin, duration);
+	return LedOneShot((Pin)pin, duration);
 }
 
 static unsigned short cmd_sensor_calibrate_white(unsigned short argc, const char **argv);

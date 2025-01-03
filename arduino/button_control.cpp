@@ -19,7 +19,7 @@ static ButtonState buttonStates[20];
 unsigned short ButtonSetup(unsigned short pin, ButtonCallback callback)
 {
 	// ピンモードを INPUT_PULLUP に設定
-	if (PinControlSetMode(pin, INPUT_PULLUP) != 0)
+	if (PinControlSetMode((Pin)pin, INPUT_PULLUP) != 0)
 	{
 		return 1; // エラー
 	}
@@ -44,7 +44,7 @@ unsigned short ButtonLoop(void)
 
 		// 現在のピンの状態を読み取る
 		short reading;
-		if (PinControlDigitalRead(pin, &reading) != 0)
+		if (PinControlDigitalRead((Pin)pin, &reading) != 0)
 		{
 			return 1; // エラー
 		}

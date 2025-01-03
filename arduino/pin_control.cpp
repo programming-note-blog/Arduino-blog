@@ -28,7 +28,14 @@ unsigned short pinModes[MAX_PIN_COUNT] = {
 	OUTPUT,
 	OUTPUT};
 
-unsigned short PinControlSetMode(unsigned short pin, unsigned short mode)
+/**
+ * @brief 指定されたピンのモードを設定します。
+ *
+ * @param pin 設定するピン番号。
+ * @param mode 設定するモード(INPUT, INPUT_PULLUP, OUTPUT)。
+ * @return 0: 成功, 1: エラー(無効なピンまたはモード)。
+ */
+unsigned short PinControlSetMode(Pin pin, unsigned short mode)
 {
 	if (pin >= MAX_PIN_COUNT)
 	{
@@ -38,12 +45,19 @@ unsigned short PinControlSetMode(unsigned short pin, unsigned short mode)
 	{
 		return 1; // Error: Invalid mode
 	}
-	pinMode(pin, (PinMode)mode);
+	pinMode((Pin)pin, (PinMode)mode);
 	pinModes[pin] = mode; // Store the mode
 	return 0;			  // Success
 }
 
-unsigned short PinControlDigitalWrite(unsigned short pin, unsigned short value)
+/**
+ * @brief 指定されたピンにデジタル値を出力します。
+ *
+ * @param pin 出力するピン番号。
+ * @param value 出力する値(LOW, HIGH)。
+ * @return 0: 成功, 1: エラー(無効なピンまたは値)。
+ */
+unsigned short PinControlDigitalWrite(Pin pin, unsigned short value)
 {
 	if (pin >= MAX_PIN_COUNT)
 	{
@@ -66,13 +80,20 @@ unsigned short PinControlDigitalWrite(unsigned short pin, unsigned short value)
 		pinModes[pin] = OUTPUT;
 	}
 
-	pinMode(pin, OUTPUT);
-	digitalWrite(pin, (PinStatus)value);
+	pinMode((Pin)pin, OUTPUT);
+	digitalWrite((Pin)pin, (PinStatus)value);
 
 	return 0; // Success
 }
 
-unsigned short PinControlDigitalRead(unsigned short pin, short *value)
+/**
+ * @brief 指定されたピンからデジタル値を読み取ります。
+ *
+ * @param pin 読み取るピン番号。
+ * @param value 読み取った値を格納するポインタ。
+ * @return 0: 成功, 1: エラー(無効なピンまたはポインタがnull)。
+ */
+unsigned short PinControlDigitalRead(Pin pin, short *value)
 {
 	if (pin >= MAX_PIN_COUNT)
 	{
@@ -84,24 +105,37 @@ unsigned short PinControlDigitalRead(unsigned short pin, short *value)
 	}
 
 	unsigned short originalMode = pinModes[pin]; // Save original mode
-	pinMode(pin, INPUT);
+	pinMode((Pin)pin, INPUT);
 	*value = digitalRead(pin);
-	pinMode(pin, (PinMode)originalMode); // Restore original mode
+	pinMode((Pin)pin, (PinMode)originalMode); // Restore original mode
 
 	return 0; // Success
 }
 
-unsigned short PinControlAnalogWrite(unsigned short pin, unsigned short value)
+/**
+ * @brief 指定されたピンにアナログ値を出力します。
+ *
+ * @param pin 出力するピン番号。
+ * @param value 出力するアナログ値(0-255)。
+ * @return 0: 成功, 1: エラー(無効なピン)。
+ */
+unsigned short PinControlAnalogWrite(Pin pin, unsigned short value)
 {
 	if (pin >= MAX_PIN_COUNT)
 	{
 		return 1; // Error: Pin out of range
 	}
-	analogWrite(pin, value);
+	analogWrite((Pin)pin, value);
 	return 0; // Success
 }
 
-unsigned short PinControlAnalogRead(unsigned short pin)
+/**
+ * @brief 指定されたピンからアナログ値を読み取ります。
+ *
+ * @param pin 読み取るピン番号。
+ * @return アナログ値(0-1023), エラー時は1を返します。
+ */
+unsigned short PinControlAnalogRead(Pin pin)
 {
 	if (pin >= MAX_PIN_COUNT)
 	{
