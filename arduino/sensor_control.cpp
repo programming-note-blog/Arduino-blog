@@ -2,6 +2,7 @@
  * @file sensor_control.cpp
  * @brief フォトリフレクタアレイ制御モジュール
  */
+#include <Arduino.h>
 
 #include "sensor_control.h"
 #include "pin_control.h"
@@ -14,12 +15,13 @@ static unsigned short sensorPins[NUM_SENSORS] = {PIN_SENSOR_0, PIN_SENSOR_1, PIN
 static unsigned short whiteCalibrated[NUM_SENSORS]; // 白色キャリブレーション値
 static unsigned short blackCalibrated[NUM_SENSORS]; // 黒色キャリブレーション値
 static unsigned short thresholds[NUM_SENSORS];		// 検出用のしきい値
+static bool isLedOn = false;						// LED状態
 
 /**
  * @brief センサモジュールを初期化します。
  * @return 0 成功
  */
-unsigned short SensorSetup(unsigned short pin)
+unsigned short SensorSetup()
 {
 	for (unsigned short i = 0; i < NUM_SENSORS; i++)
 	{
@@ -27,7 +29,27 @@ unsigned short SensorSetup(unsigned short pin)
 		blackCalibrated[i] = 1023;
 		thresholds[i] = 512; // デフォルトの中間値
 	}
-	return LedOn(pin);
+	return 0; // 成功
+}
+
+/**
+ * @brief センサLEDをONにします。
+ * @return 0 成功
+ */
+unsigned short SensorControlLedOn()
+{
+	isLedOn = true;
+	return LedOn(PIN_SENSOR_LEDON);
+}
+
+/**
+ * @brief センサLEDをOFFにします。
+ * @return 0 成功
+ */
+unsigned short SensorControlLedOff()
+{
+	isLedOn = false;
+	return LedOff(PIN_SENSOR_LEDON);
 }
 
 /**
@@ -37,6 +59,9 @@ unsigned short SensorSetup(unsigned short pin)
 unsigned short SensorControlCalibrateWhite()
 {
 	unsigned short sampleSums[NUM_SENSORS] = {0};
+
+	SensorControlLedOn();
+
 	for (unsigned short sample = 0; sample < CALIBRATION_SAMPLES; sample++)
 	{
 		for (unsigned short i = 0; i < NUM_SENSORS; i++)
@@ -48,6 +73,8 @@ unsigned short SensorControlCalibrateWhite()
 	{
 		whiteCalibrated[i] = sampleSums[i] >> 3; // 平均値をビットシフトで計算
 	}
+
+	SensorControlLedOff();
 	return 0; // 成功
 }
 
@@ -58,6 +85,9 @@ unsigned short SensorControlCalibrateWhite()
 unsigned short SensorControlCalibrateBlack()
 {
 	unsigned short sampleSums[NUM_SENSORS] = {0};
+
+	SensorControlLedOn();
+
 	for (unsigned short sample = 0; sample < CALIBRATION_SAMPLES; sample++)
 	{
 		for (unsigned short i = 0; i < NUM_SENSORS; i++)
@@ -69,6 +99,8 @@ unsigned short SensorControlCalibrateBlack()
 	{
 		blackCalibrated[i] = sampleSums[i] >> 3; // 平均値をビットシフトで計算
 	}
+
+	SensorControlLedOff();
 	return 0; // 成功
 }
 
@@ -91,6 +123,14 @@ unsigned short SensorControlUpdateThresholds()
  */
 unsigned char SensorControlGetBinaryOutput()
 {
+	if (!isLedOn)
+	{
+		Serial.println("Error: Sensor LED is OFF. Turn it ON before calling this function.");
+
+		LedOneShot(PIN_BUZZER, 1000); // エラー報告
+		return 0;
+	}
+
 	unsigned char binaryOutput = 0;
 	for (unsigned short i = 0; i < NUM_SENSORS; i++)
 	{

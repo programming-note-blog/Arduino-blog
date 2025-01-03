@@ -10,8 +10,19 @@
  * @brief センサモジュールを初期化します。
  * @return 0 成功
  */
-unsigned short SensorSetup(unsigned short pin);
+unsigned short SensorSetup();
 
+/**
+ * @brief センサLEDをONにします。
+ * @return 0 成功
+ */
+unsigned short SensorControlLedOn();
+
+/**
+ * @brief センサLEDをOFFにします。
+ * @return 0 成功
+ */
+unsigned short SensorControlLedOff();
 /**
  * @brief 白色表面のキャリブレーションを実行します。
  * @return 0 成功

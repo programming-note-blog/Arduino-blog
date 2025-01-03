@@ -3,12 +3,12 @@
 #include <stdbool.h>
 
 #include "state.h"
+#include "sensor_control.h"
 
 // 現在の状態の保持
 static EState currentState = STATE_STANDBY;
 
 // 各種機能のON/OFFを管理する変数
-static bool moveFunctionOn = false;
 static bool endoscopeLockOn = false;
 static bool alertOn = false;
 static bool forgetAlertOn = false;
@@ -29,14 +29,14 @@ void StateOnButtonPress()
 	case STATE_STANDBY:
 		currentState = STATE_LINETRACING;
 		Serial.println("Standby -> LineTracing\n");
-		moveFunctionOn = true;
+		SensorControlLedOn();
 		endoscopeLockOn = true;
 		alertOn = true;
 		break;
 	case STATE_LINETRACING:
 		currentState = STATE_STANDBY;
 		Serial.println("LineTracing -> Standby\n");
-		moveFunctionOn = false;
+		SensorControlLedOff();
 		endoscopeLockOn = false;
 		alertOn = false;
 		break;
@@ -62,7 +62,7 @@ void StateOnArrive(void)
 	{
 		currentState = STATE_STOPPED;
 		Serial.println("LineTracing -> Stopped\n");
-		moveFunctionOn = false;
+		SensorControlLedOff();
 		endoscopeLockOn = false;
 		alertOn = false;
 		forgetAlertOn = true;

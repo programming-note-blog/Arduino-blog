@@ -65,7 +65,7 @@ void setup()
 	ButtonSetup(PIN_BUTTON_B, onButtonPress2);
 	ButtonSetup(PIN_BUTTON_START, onButtonPress);
 	MotorSetup();
-	SensorSetup(PIN_SENSOR_LedOn);
+	SensorSetup();
 
 	// 周期処理の設定
 	// STATE_STANDBYの周期処理設定
