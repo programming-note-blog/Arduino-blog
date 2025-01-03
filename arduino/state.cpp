@@ -1,7 +1,5 @@
 #include <Arduino.h>
 
-#include <stdbool.h>
-
 #include "state.h"
 #include "sensor_control.h"
 
