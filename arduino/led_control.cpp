@@ -33,7 +33,7 @@ static void InitializeLEDState(unsigned short pin) {
 }
 
 // LED点灯関数
-unsigned short LEDOn(unsigned short pin) {
+unsigned short LedOn(unsigned short pin) {
   if (pin >= 20) return 1; // 範囲外のピン番号をチェック
   InitializeLEDState(pin);
   if (PinControlDigitalWrite(pin, HIGH) != 0) return 1; // ピン制御モジュールを使用
@@ -45,7 +45,7 @@ unsigned short LEDOn(unsigned short pin) {
 }
 
 // LED消灯関数
-unsigned short LEDOff(unsigned short pin) {
+unsigned short LedOff(unsigned short pin) {
   if (pin >= 20) return 1; // 範囲外のピン番号をチェック
   InitializeLEDState(pin);
   if (PinControlDigitalWrite(pin, LOW) != 0) return 1; // ピン制御モジュールを使用
@@ -57,7 +57,7 @@ unsigned short LEDOff(unsigned short pin) {
 }
 
 // LED点滅設定関数
-unsigned short LEDBlink(unsigned short pin, unsigned long interval) {
+unsigned short LedBlink(unsigned short pin, unsigned long interval) {
   if (pin >= 20) return 1; // 範囲外のピン番号をチェック
   InitializeLEDState(pin);
   ledStates[pin].isBlinking = true;
@@ -69,7 +69,7 @@ unsigned short LEDBlink(unsigned short pin, unsigned long interval) {
 }
 
 // LED一度だけ点灯関数
-unsigned short LEDOneShot(unsigned short pin, unsigned long duration) {
+unsigned short LedOneShot(unsigned short pin, unsigned long duration) {
   if (pin >= 20) return 1; // 範囲外のピン番号をチェック
   InitializeLEDState(pin);
   if (PinControlDigitalWrite(pin, HIGH) != 0) return 1; // 点灯
@@ -83,7 +83,7 @@ unsigned short LEDOneShot(unsigned short pin, unsigned long duration) {
 }
 
 // LED特定パターン設定関数
-unsigned short LEDPattern(unsigned short pin) {
+unsigned short LedPattern(unsigned short pin) {
   if (pin >= 20) return 1; // 範囲外のピン番号をチェック
   InitializeLEDState(pin);
   ledStates[pin].isBlinking = false; // 点滅を無効化
@@ -97,7 +97,7 @@ unsigned short LEDPattern(unsigned short pin) {
 }
 
 // LED状態更新関数（点滅処理のため、定期的に呼び出す）
-unsigned short LEDUpdate(void) {
+unsigned short LedLoop(void) {
   for (unsigned short pin = 0; pin < 20; pin++) {
     if (ledStates[pin].isBlinking) {
       unsigned long currentTime = millis();

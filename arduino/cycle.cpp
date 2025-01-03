@@ -15,7 +15,7 @@ static unsigned long gs_last_time = 0;
 static EState current_state;
 static SStateCycle stateCycles[STATE_COUNT] = {0};
 
-void CycleSetFunc(void (*func)(), EState state, unsigned long timeAfterStart) {
+void CycleSetup(void (*func)(), EState state, unsigned long timeAfterStart) {
   if (stateCycles[state].funcCount < MAX_FUNC_COUNT) {
     int index = stateCycles[state].funcCount;
     stateCycles[state].funcList[index].func = func;
@@ -41,7 +41,7 @@ static void CycleReset() {
   gs_last_time = gs_current_time;
 }
 
-void CycleCall() {
+void CycleLoop() {
   gs_current_time = millis();
 
   if (gs_current_time - gs_last_time >= PERIODIC_INTERVAL) {

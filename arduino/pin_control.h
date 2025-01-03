@@ -9,7 +9,7 @@
 #define PIN_L_MOTOR_1 9
 #define PIN_L_MOTOR_2 10
 #define PIN_BUTTON_START 11
-#define PIN_SENSOR_LEDON 13
+#define PIN_SENSOR_LedOn 13
 #define PIN_SENSOR_0 14
 #define PIN_SENSOR_1 15
 #define PIN_SENSOR_2 16

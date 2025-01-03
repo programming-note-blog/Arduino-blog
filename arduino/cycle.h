@@ -11,9 +11,9 @@ struct SCycleFunc {
   bool shouldCall;
 };
 
-void CycleSetFunc(void (*func)(), EState state, unsigned long timeAfterStart);
+void CycleSetup(void (*func)(), EState state, unsigned long timeAfterStart);
 static void CycleReset();
-void CycleCall();
+void CycleLoop();
 void CycleSetState(EState state);
 
 #endif // CYCLE_H

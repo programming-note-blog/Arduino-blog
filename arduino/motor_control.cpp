@@ -6,7 +6,7 @@
 static unsigned short rightMotorPins[2] = {PIN_R_MOTOR_1, PIN_R_MOTOR_2}; // Pins for the right motor
 static unsigned short leftMotorPins[2] = {PIN_L_MOTOR_1, PIN_L_MOTOR_2}; // Pins for the left motor
 
-unsigned short MotorControlInit() {
+unsigned short MotorSetup() {
   for (unsigned short i = 0; i < 2; i++) {
     PinControlAnalogWrite(rightMotorPins[i], 0); // Initialize with 0 duty cycle
     PinControlAnalogWrite(leftMotorPins[i], 0); // Initialize with 0 duty cycle

@@ -15,7 +15,7 @@ struct ButtonState {
 // 最大20個のピンのボタン状態を管理
 static ButtonState buttonStates[20];
 
-unsigned short ButtonInit(unsigned short pin, ButtonCallback callback) {
+unsigned short ButtonSetup(unsigned short pin, ButtonCallback callback) {
   // ピンモードを INPUT_PULLUP に設定
   if (PinControlSetMode(pin, INPUT_PULLUP) != 0) {
     return 1; // エラー
@@ -30,7 +30,7 @@ unsigned short ButtonInit(unsigned short pin, ButtonCallback callback) {
   return 0;
 }
 
-unsigned short ButtonRead(void) {
+unsigned short ButtonLoop(void) {
   for (unsigned short pin = 0; pin < 20; pin++) {
     if (buttonStates[pin].callback == nullptr) {
       continue; // コールバックが登録されていないピンはスキップ

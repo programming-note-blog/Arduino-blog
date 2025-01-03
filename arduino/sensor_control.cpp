@@ -19,13 +19,13 @@ static unsigned short thresholds[NUM_SENSORS]; // 検出用のしきい値
  * @brief センサモジュールを初期化します。
  * @return 0 成功
  */
-unsigned short SensorControlInit(unsigned short pin) {
+unsigned short SensorSetup(unsigned short pin) {
     for (unsigned short i = 0; i < NUM_SENSORS; i++) {
         whiteCalibrated[i] = 0;
         blackCalibrated[i] = 1023;
         thresholds[i] = 512; // デフォルトの中間値
     }
-    return LEDOn(pin);
+    return LedOn(pin);
 }
 
 /**

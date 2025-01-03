@@ -18,7 +18,7 @@ static char* ArgV[ARGC_MAX];
 static unsigned short get_arg(char* line, char** argv);
 
 
-void SerialInit(void)
+void SerialSetup(void)
 {
   pReadBufferEnd = &ReadBuffer[0];
 
@@ -28,7 +28,7 @@ void SerialInit(void)
 }
 
 
-void SerialRead(void)
+void SerialLoop(void)
 {
   if(Serial.available() <= 0)
   {

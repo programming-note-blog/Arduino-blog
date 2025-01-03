@@ -254,7 +254,7 @@ static unsigned short cmd_led_oneshot(unsigned short argc, const char** argv)
   unsigned short pin = atoi(argv[0]);
   unsigned short duration = atoi(argv[1]);
 
-  return LEDOneShot(pin, duration);
+  return LedOneShot(pin, duration);
 }
 
 static unsigned short cmd_sensor_calibrate_white(unsigned short argc, const char** argv);
