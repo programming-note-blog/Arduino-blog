@@ -26,8 +26,13 @@ void onButtonPress1()
 void onButtonPress2()
 {
 	SensorControlCalibrateBlack();
-	SensorControlUpdateThresholds();
 	LedOneShot(PIN_BUZZER, 100);
+}
+
+void onButtonRelease2()
+{
+	SensorControlUpdateThresholds();
+	LedPattern(PIN_BUZZER);
 }
 
 static void UpdateCurrentState()
@@ -61,9 +66,9 @@ static void Func4()
 void setup()
 {
 	SerialSetup();
-	ButtonSetup(PIN_BUTTON_W, onButtonPress1);
-	ButtonSetup(PIN_BUTTON_B, onButtonPress2);
-	ButtonSetup(PIN_BUTTON_START, onButtonPress);
+	ButtonSetup(PIN_BUTTON_W, onButtonPress1, nullptr);
+	ButtonSetup(PIN_BUTTON_B, onButtonPress2, onButtonRelease2);
+	ButtonSetup(PIN_BUTTON_START, onButtonPress, nullptr);
 	MotorSetup();
 	SensorSetup();
 
