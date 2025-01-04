@@ -5,6 +5,12 @@
 
 #define MAX_FUNC_COUNT 5
 
+struct SCycleFunc {
+  void (*func)();
+  unsigned long timeAfterStart;
+  bool shouldCall;
+};
+
 struct SStateCycle {
   SCycleFunc funcList[MAX_FUNC_COUNT];
   int funcCount;
@@ -15,7 +21,9 @@ static unsigned long gs_last_time = 0;
 static EState current_state;
 static SStateCycle stateCycles[STATE_COUNT] = {0};
 
-void CycleSetFunc(void (*func)(), EState state, unsigned long timeAfterStart) {
+static void CycleReset();
+
+void CycleSetup(void (*func)(), EState state, unsigned long timeAfterStart) {
   if (stateCycles[state].funcCount < MAX_FUNC_COUNT) {
     int index = stateCycles[state].funcCount;
     stateCycles[state].funcList[index].func = func;
@@ -41,7 +49,7 @@ static void CycleReset() {
   gs_last_time = gs_current_time;
 }
 
-void CycleCall() {
+void CycleLoop() {
   gs_current_time = millis();
 
   if (gs_current_time - gs_last_time >= PERIODIC_INTERVAL) {
