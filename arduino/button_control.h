@@ -3,7 +3,7 @@
 
 typedef void (*ButtonCallback)(void);
 
-unsigned short ButtonSetup(unsigned short pin, ButtonCallback callback);
+unsigned short ButtonSetup(unsigned short pin, ButtonCallback onPress, ButtonCallback onRelease);
 unsigned short ButtonLoop(void);
 
 #endif // BUTTON_CONTROL_H
