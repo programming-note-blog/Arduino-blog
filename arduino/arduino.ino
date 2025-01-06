@@ -20,6 +20,7 @@
  * - center: ラインの中心位置
  * - error: ライン中心からの偏差
  * - previousError: 前回の偏差
+ * - integral: 偏差の積分値
  */
 struct FrameInfo
 {
@@ -30,6 +31,7 @@ struct FrameInfo
 	float center = 0.0f;		   ///< ラインの中心位置
 	float error = 0.0f;			   ///< ライン中心からの偏差
 	float previousError = 0.0f;	   ///< 前回の偏差
+	float integral = 0.0f;		   ///< 偏差の積分値
 };
 
 static FrameInfo frameInfo;
@@ -94,6 +96,7 @@ static void ReadSensorData()
  * @details
  * - センサー情報からラインの中心位置を計算
  * - 偏差と制御値を計算し、モーター速度を設定
+ * - PID制御（比例・積分・微分制御）を適用
  */
 static void CalculateMotorSpeeds()
 {
@@ -116,13 +119,16 @@ static void CalculateMotorSpeeds()
 
 	// 偏差と制御値を計算
 	frameInfo.error = 3.5f - frameInfo.center;
+	frameInfo.integral += frameInfo.error; // 偏差の積分
+	frameInfo.integral = constrain(frameInfo.integral, -20, 20);
 
 	const short baseSpeed = 150; ///< 基本速度
 	const float Kp = 30.0f;		 ///< 比例ゲイン
+	const float Ki = 5.0f;		 // 0;			 ///< 積分ゲイン(未使用)
 	const float Kd = 10.0f;		 ///< 微分ゲイン
 
 	float derivative = frameInfo.error - frameInfo.previousError;
-	short adjustment = static_cast<short>(Kp * frameInfo.error + Kd * derivative);
+	short adjustment = static_cast<short>(Kp * frameInfo.error + Ki * frameInfo.integral + Kd * derivative);
 
 	frameInfo.leftSpeed = baseSpeed - adjustment;
 	frameInfo.rightSpeed = baseSpeed + adjustment;
@@ -142,6 +148,10 @@ static void ApplyMotorSpeeds()
 {
 	MotorControlSetLeftMotorSpeed(frameInfo.leftSpeed);
 	MotorControlSetRightMotorSpeed(frameInfo.rightSpeed);
+
+	Serial.print(frameInfo.leftSpeed);
+	Serial.print(",");
+	Serial.println(frameInfo.rightSpeed);
 }
 
 /**
