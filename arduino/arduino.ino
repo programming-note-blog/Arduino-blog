@@ -10,117 +10,152 @@
 #include "cycle.h"
 #include "state.h"
 
-// ボタンが押されたときの処理(仮)
+/**
+ * @brief ライントレース用のフレーム情報を管理する構造体
+ *
+ * - sensorData: センサーから取得したバイナリデータ
+ * - frameIndex: 現在のフレームインデックス
+ * - leftSpeed: 左モーターの速度
+ * - rightSpeed: 右モーターの速度
+ * - center: ラインの中心位置
+ * - error: ライン中心からの偏差
+ * - previousError: 前回の偏差
+ */
+struct FrameInfo
+{
+	unsigned char sensorData = 0;  ///< センサー出力データ
+	unsigned short frameIndex = 0; ///< フレームインデックス
+	short leftSpeed = 0;		   ///< 左モーター速度
+	short rightSpeed = 0;		   ///< 右モーター速度
+	float center = 0.0f;		   ///< ラインの中心位置
+	float error = 0.0f;			   ///< ライン中心からの偏差
+	float previousError = 0.0f;	   ///< 前回の偏差
+};
+
+static FrameInfo frameInfo;
+
+/**
+ * @brief ボタン押下時の処理
+ * @details 現在の状態を更新し、LEDを短時間点灯させる。
+ */
 void onButtonPress()
 {
 	StateOnButtonPress();
 	LedOneShot(PIN_BUZZER, 100);
 }
 
+/**
+ * @brief 白色キャリブレーションを行うボタン処理
+ */
 void onButtonPress1()
 {
 	SensorControlCalibrateWhite();
 	LedOneShot(PIN_BUZZER, 100);
 }
 
+/**
+ * @brief 黒色キャリブレーションを行うボタン処理
+ */
 void onButtonPress2()
 {
 	SensorControlCalibrateBlack();
 	LedOneShot(PIN_BUZZER, 100);
 }
 
+/**
+ * @brief 閾値更新を行うボタン処理
+ */
 void onButtonRelease2()
 {
 	SensorControlUpdateThresholds();
 	LedPattern(PIN_BUZZER);
 }
 
+/**
+ * @brief 現在の状態を更新する処理
+ */
 static void UpdateCurrentState()
 {
 	CycleSetState(StateGetCurrentstate());
 }
 
-unsigned char sensorData;
-unsigned short frameindex = 0;
-static void Func1()
+/**
+ * @brief センサーからデータを読み取る処理
+ * @details センサー出力を取得し、フレームインデックスをインクリメントする。
+ */
+static void ReadSensorData()
 {
-	sensorData = SensorControlGetBinaryOutput(); // 実測0.93us
-	frameindex++;
+	frameInfo.sensorData = SensorControlGetBinaryOutput();
+	frameInfo.frameIndex++;
 }
 
-short leftSpeed;
-short rightSpeed;
-static void Func2()
+/**
+ * @brief モーター速度を計算する処理
+ * @details
+ * - センサー情報からラインの中心位置を計算
+ * - 偏差と制御値を計算し、モーター速度を設定
+ */
+static void CalculateMotorSpeeds()
 {
-	// 中心位置計算
-	float center;
+	// ラインの中心位置を計算
 	{
 		int count = 0; // ライン上のビット数
 		int sum = 0;   // ラインの位置の合計
 
 		for (int i = 0; i < 8; i++)
 		{
-			if (sensorData & (1 << i))
+			if (frameInfo.sensorData & (1 << i))
 			{
 				sum += i;
 				count++;
 			}
 		}
 
-		if (count == 0)
-		{
-			center = 3.5; // ラインが見つからない場合
-		}
-		else
-		{
-			center = (float)sum / count; // 中心位置を計算
-		}
+		frameInfo.center = (count == 0) ? 3.5f : static_cast<float>(sum) / count;
 	}
 
-	float error = 3.5 - center;
-	// 制御値算出
-	{
-		const short baseSpeed = 150; // 基本速度
-		const float Kp = 30.0;		 // 比例ゲイン
-		const float Kd = 10.0;		 // 微分ゲイン
+	// 偏差と制御値を計算
+	frameInfo.error = 3.5f - frameInfo.center;
 
-		static float previousError = 0;
-		float derivative = error - previousError;
+	const short baseSpeed = 150; ///< 基本速度
+	const float Kp = 30.0f;		 ///< 比例ゲイン
+	const float Kd = 10.0f;		 ///< 微分ゲイン
 
-		short adjustment = (short)(Kp * error + Kd * derivative);
+	float derivative = frameInfo.error - frameInfo.previousError;
+	short adjustment = static_cast<short>(Kp * frameInfo.error + Kd * derivative);
 
-		leftSpeed = baseSpeed - adjustment;
-		rightSpeed = baseSpeed + adjustment;
+	frameInfo.leftSpeed = baseSpeed - adjustment;
+	frameInfo.rightSpeed = baseSpeed + adjustment;
 
-		// モーター速度を0～255に制限
-		if (leftSpeed < 0)
-			leftSpeed = 0;
-		if (leftSpeed > 255)
-			leftSpeed = 255;
-		if (rightSpeed < 0)
-			rightSpeed = 0;
-		if (rightSpeed > 255)
-			rightSpeed = 255;
+	// モーター速度を制限
+	frameInfo.leftSpeed = constrain(frameInfo.leftSpeed, 0, 255);
+	frameInfo.rightSpeed = constrain(frameInfo.rightSpeed, 0, 255);
 
-		previousError = error;
-	}
+	frameInfo.previousError = frameInfo.error;
 }
 
-static void Func3()
+/**
+ * @brief モーター速度を適用する処理
+ * @details 計算された速度を左右のモーターに適用する。
+ */
+static void ApplyMotorSpeeds()
 {
-	MotorControlSetLeftMotorSpeed(leftSpeed);
-	MotorControlSetRightMotorSpeed(rightSpeed);
-
-	Serial.print(leftSpeed);
-	Serial.print(",");
-	Serial.println(rightSpeed);
+	MotorControlSetLeftMotorSpeed(frameInfo.leftSpeed);
+	MotorControlSetRightMotorSpeed(frameInfo.rightSpeed);
 }
 
-static void Func4()
+/**
+ * @brief 停止状態のログを出力する処理
+ */
+static void LogStoppedState()
 {
-	printf("Func4 called:%d\n", millis());
+	printf("Stopped state log: %lu\n", millis());
 }
 
+/**
+ * @brief 初期化処理
+ * @details 各モジュールの初期化と周期処理の設定を行う。
+ */
 void setup()
 {
 	SerialSetup();
@@ -131,20 +166,25 @@ void setup()
 	SensorSetup();
 
 	// 周期処理の設定
-	// STATE_STANDBYの周期処理設定
 	CycleSetup(UpdateCurrentState, STATE_STANDBY, 0);
+
 	// STATE_LINETRACINGの周期処理設定
 	CycleSetup(UpdateCurrentState, STATE_LINETRACING, 0);
-	CycleSetup(Func1, STATE_LINETRACING, 1); // センサー情報取得
-	CycleSetup(Func2, STATE_LINETRACING, 2); // 制御値算出
-	CycleSetup(Func3, STATE_LINETRACING, 7); // 制御値設定
+	CycleSetup(ReadSensorData, STATE_LINETRACING, 1);
+	CycleSetup(CalculateMotorSpeeds, STATE_LINETRACING, 2);
+	CycleSetup(ApplyMotorSpeeds, STATE_LINETRACING, 7);
+
 	// STATE_STOPPEDの周期処理設定
 	CycleSetup(UpdateCurrentState, STATE_STOPPED, 0);
-	CycleSetup(Func4, STATE_STOPPED, 0); // アラーム鳴らす
+	CycleSetup(LogStoppedState, STATE_STOPPED, 0);
 
-	LedPattern(PIN_BUZZER); // 起動時にピピと鳴らす
+	LedPattern(PIN_BUZZER); // 起動時のサウンド
 }
 
+/**
+ * @brief メインループ
+ * @details シリアル通信、ボタン処理、LED処理、周期処理を実行する。
+ */
 void loop()
 {
 	SerialLoop();
