@@ -40,22 +40,80 @@ static void UpdateCurrentState()
 	CycleSetState(StateGetCurrentstate());
 }
 
+unsigned char sensorData;
+unsigned short frameindex = 0;
 static void Func1()
 {
-	printf("Func1 called:%d\n", millis());
-
-	const char *ArgV[2] = {"sensor", "get"};
-	CommandExecute(2, ArgV);
+	sensorData = SensorControlGetBinaryOutput(); // 実測0.93us
+	frameindex++;
 }
 
+short leftSpeed;
+short rightSpeed;
 static void Func2()
 {
-	printf("Func2 called:%d\n", millis());
+	// 中心位置計算
+	float center;
+	{
+		int count = 0; // ライン上のビット数
+		int sum = 0;   // ラインの位置の合計
+
+		for (int i = 0; i < 8; i++)
+		{
+			if (sensorData & (1 << i))
+			{
+				sum += i;
+				count++;
+			}
+		}
+
+		if (count == 0)
+		{
+			center = 3.5; // ラインが見つからない場合
+		}
+		else
+		{
+			center = (float)sum / count; // 中心位置を計算
+		}
+	}
+
+	float error = 3.5 - center;
+	// 制御値算出
+	{
+		const short baseSpeed = 150; // 基本速度
+		const float Kp = 30.0;		 // 比例ゲイン
+		const float Kd = 10.0;		 // 微分ゲイン
+
+		static float previousError = 0;
+		float derivative = error - previousError;
+
+		short adjustment = (short)(Kp * error + Kd * derivative);
+
+		leftSpeed = baseSpeed - adjustment;
+		rightSpeed = baseSpeed + adjustment;
+
+		// モーター速度を0～255に制限
+		if (leftSpeed < 0)
+			leftSpeed = 0;
+		if (leftSpeed > 255)
+			leftSpeed = 255;
+		if (rightSpeed < 0)
+			rightSpeed = 0;
+		if (rightSpeed > 255)
+			rightSpeed = 255;
+
+		previousError = error;
+	}
 }
 
 static void Func3()
 {
-	printf("Func3 called:%d\n", millis());
+	MotorControlSetLeftMotorSpeed(leftSpeed);
+	MotorControlSetRightMotorSpeed(rightSpeed);
+
+	Serial.print(leftSpeed);
+	Serial.print(",");
+	Serial.println(rightSpeed);
 }
 
 static void Func4()
@@ -78,7 +136,7 @@ void setup()
 	// STATE_LINETRACINGの周期処理設定
 	CycleSetup(UpdateCurrentState, STATE_LINETRACING, 0);
 	CycleSetup(Func1, STATE_LINETRACING, 1); // センサー情報取得
-	CycleSetup(Func2, STATE_LINETRACING, 5); // 制御値算出
+	CycleSetup(Func2, STATE_LINETRACING, 2); // 制御値算出
 	CycleSetup(Func3, STATE_LINETRACING, 7); // 制御値設定
 	// STATE_STOPPEDの周期処理設定
 	CycleSetup(UpdateCurrentState, STATE_STOPPED, 0);
