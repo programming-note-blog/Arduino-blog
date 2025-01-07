@@ -123,13 +123,7 @@ unsigned short SensorControlUpdateThresholds()
  */
 unsigned char SensorControlGetBinaryOutput()
 {
-	if (!isLedOn)
-	{
-		Serial.println("Error: Sensor LED is OFF. Turn it ON before calling this function.");
-
-		LedOneShot(PIN_BUZZER, 1000); // エラー報告
-		return 0;
-	}
+	SensorControlLedOn();
 
 	unsigned char binaryOutput = 0;
 	for (unsigned short i = 0; i < NUM_SENSORS; i++)
@@ -140,5 +134,7 @@ unsigned char SensorControlGetBinaryOutput()
 			binaryOutput |= (1 << i);
 		}
 	}
+
+	SensorControlLedOff();
 	return binaryOutput;
 }

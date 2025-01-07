@@ -27,14 +27,12 @@ void StateOnButtonPress()
 	case STATE_STANDBY:
 		currentState = STATE_LINETRACING;
 		Serial.println("Standby -> LineTracing\n");
-		SensorControlLedOn();
 		endoscopeLockOn = true;
 		alertOn = true;
 		break;
 	case STATE_LINETRACING:
 		currentState = STATE_STANDBY;
 		Serial.println("LineTracing -> Standby\n");
-		SensorControlLedOff();
 		endoscopeLockOn = false;
 		alertOn = false;
 		break;

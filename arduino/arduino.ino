@@ -124,7 +124,7 @@ static void CalculateMotorSpeeds()
 
 	const short baseSpeed = 150; ///< 基本速度
 	const float Kp = 30.0f;		 ///< 比例ゲイン
-	const float Ki = 5.0f;		 // 0;			 ///< 積分ゲイン(未使用)
+	const float Ki = 0.5f;		 ///< 積分ゲイン
 	const float Kd = 10.0f;		 ///< 微分ゲイン
 
 	float derivative = frameInfo.error - frameInfo.previousError;
@@ -149,9 +149,9 @@ static void ApplyMotorSpeeds()
 	MotorControlSetLeftMotorSpeed(frameInfo.leftSpeed);
 	MotorControlSetRightMotorSpeed(frameInfo.rightSpeed);
 
-	Serial.print(frameInfo.leftSpeed);
-	Serial.print(",");
-	Serial.println(frameInfo.rightSpeed);
+	// Serial.print(frameInfo.leftSpeed);
+	// Serial.print(",");
+	// Serial.println(frameInfo.rightSpeed);
 }
 
 /**
