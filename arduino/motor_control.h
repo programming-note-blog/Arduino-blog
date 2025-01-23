@@ -2,6 +2,8 @@
 #define MOTOR_CONTROL_H
 
 unsigned short MotorSetup();
+unsigned short MotorControlStart();
+unsigned short MotorControlStop();
 unsigned short MotorControlSetRightMotorSpeed(short speed);
 unsigned short MotorControlSetLeftMotorSpeed(short speed);
 unsigned short MotorControlStopRightMotor();

@@ -6,6 +6,8 @@
 static Pin rightMotorPins[2] = {PIN_R_MOTOR_1, PIN_R_MOTOR_2}; // Pins for the right motor
 static Pin leftMotorPins[2] = {PIN_L_MOTOR_1, PIN_L_MOTOR_2};  // Pins for the left motor
 
+static bool motorControlEnabled = false; // Motor control state
+
 unsigned short MotorSetup()
 {
 	for (unsigned short i = 0; i < 2; i++)
@@ -13,11 +15,34 @@ unsigned short MotorSetup()
 		PinControlAnalogWrite(rightMotorPins[i], 0); // Initialize with 0 duty cycle
 		PinControlAnalogWrite(leftMotorPins[i], 0);	 // Initialize with 0 duty cycle
 	}
+	motorControlEnabled = false; // Ensure motor control is disabled initially
+	return 0;					 // Success
+}
+
+unsigned short MotorControlStart()
+{
+	motorControlEnabled = true; // Enable motor control
+	return 0;					// Success
+}
+
+unsigned short MotorControlStop()
+{
+	motorControlEnabled = false; // Disable motor control
+
+	// Stop all motors
+	MotorControlStopRightMotor();
+	MotorControlStopLeftMotor();
+
 	return 0; // Success
 }
 
 unsigned short MotorControlSetRightMotorSpeed(short speed)
 {
+	if (!motorControlEnabled)
+	{
+		return 2; // Error: Motor control not enabled
+	}
+
 	if (speed > PWM_RESOLUTION || speed < -PWM_RESOLUTION)
 	{
 		return 1; // Error: Speed out of range
@@ -39,6 +64,11 @@ unsigned short MotorControlSetRightMotorSpeed(short speed)
 
 unsigned short MotorControlSetLeftMotorSpeed(short speed)
 {
+	if (!motorControlEnabled)
+	{
+		return 2; // Error: Motor control not enabled
+	}
+
 	if (speed > PWM_RESOLUTION || speed < -PWM_RESOLUTION)
 	{
 		return 1; // Error: Speed out of range

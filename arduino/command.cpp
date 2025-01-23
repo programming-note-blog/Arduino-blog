@@ -201,6 +201,7 @@ static unsigned short cmd_motor_set_right(unsigned short argc, const char **argv
 	if (argc < 1)
 		return ERROR;
 	short speed = atoi(argv[0]);
+	MotorControlStart();
 	return MotorControlSetRightMotorSpeed(speed);
 }
 
@@ -209,11 +210,13 @@ static unsigned short cmd_motor_set_left(unsigned short argc, const char **argv)
 	if (argc < 1)
 		return ERROR;
 	short speed = atoi(argv[0]);
+	MotorControlStart();
 	return MotorControlSetLeftMotorSpeed(speed);
 }
 
 static unsigned short cmd_motor_stop(unsigned short argc, const char **argv)
 {
+	MotorControlStart();
 	MotorControlStopRightMotor();
 	MotorControlStopLeftMotor();
 	return SUCCESS;

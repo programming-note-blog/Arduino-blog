@@ -2,6 +2,7 @@
 
 #include "state.h"
 #include "sensor_control.h"
+#include "motor_control.h"
 
 // 現在の状態の保持
 static EState currentState = STATE_STANDBY;
@@ -27,12 +28,14 @@ void StateOnButtonPress()
 	case STATE_STANDBY:
 		currentState = STATE_LINETRACING;
 		Serial.println("Standby -> LineTracing\n");
+		MotorControlStart();
 		endoscopeLockOn = true;
 		alertOn = true;
 		break;
 	case STATE_LINETRACING:
 		currentState = STATE_STANDBY;
 		Serial.println("LineTracing -> Standby\n");
+		MotorControlStop();
 		endoscopeLockOn = false;
 		alertOn = false;
 		break;
@@ -40,6 +43,7 @@ void StateOnButtonPress()
 		if (isEndoscopeChecked())
 		{
 			currentState = STATE_STANDBY;
+			MotorControlStop();
 			Serial.println("Stopped -> Standby\n");
 			forgetAlertOn = false;
 		}
@@ -58,7 +62,7 @@ void StateOnArrive(void)
 	{
 		currentState = STATE_STOPPED;
 		Serial.println("LineTracing -> Stopped\n");
-		SensorControlLedOff();
+		MotorControlStop();
 		endoscopeLockOn = false;
 		alertOn = false;
 		forgetAlertOn = true;

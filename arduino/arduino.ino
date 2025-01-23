@@ -76,8 +76,9 @@ void onButtonRelease2()
 /**
  * @brief 現在の状態を更新する処理
  */
-static void UpdateCurrentState()
+static void PreMainCycle()
 {
+	frameInfo.frameIndex++;
 	CycleSetState(StateGetCurrentstate());
 }
 
@@ -88,7 +89,6 @@ static void UpdateCurrentState()
 static void ReadSensorData()
 {
 	frameInfo.sensorData = SensorControlGetBinaryOutput();
-	frameInfo.frameIndex++;
 }
 
 /**
@@ -130,8 +130,8 @@ static void CalculateMotorSpeeds()
 	float derivative = frameInfo.error - frameInfo.previousError;
 	short adjustment = static_cast<short>(Kp * frameInfo.error + Ki * frameInfo.integral + Kd * derivative);
 
-	frameInfo.leftSpeed = baseSpeed - adjustment;
-	frameInfo.rightSpeed = baseSpeed + adjustment;
+	frameInfo.leftSpeed = baseSpeed + adjustment;
+	frameInfo.rightSpeed = baseSpeed - adjustment;
 
 	// モーター速度を制限
 	frameInfo.leftSpeed = constrain(frameInfo.leftSpeed, 0, 255);
@@ -176,16 +176,16 @@ void setup()
 	SensorSetup();
 
 	// 周期処理の設定
-	CycleSetup(UpdateCurrentState, STATE_STANDBY, 0);
+	CycleSetup(PreMainCycle, STATE_STANDBY, 0);
 
 	// STATE_LINETRACINGの周期処理設定
-	CycleSetup(UpdateCurrentState, STATE_LINETRACING, 0);
+	CycleSetup(PreMainCycle, STATE_LINETRACING, 0);
 	CycleSetup(ReadSensorData, STATE_LINETRACING, 1);
 	CycleSetup(CalculateMotorSpeeds, STATE_LINETRACING, 2);
 	CycleSetup(ApplyMotorSpeeds, STATE_LINETRACING, 7);
 
 	// STATE_STOPPEDの周期処理設定
-	CycleSetup(UpdateCurrentState, STATE_STOPPED, 0);
+	CycleSetup(PreMainCycle, STATE_STOPPED, 0);
 	CycleSetup(LogStoppedState, STATE_STOPPED, 0);
 
 	LedPattern(PIN_BUZZER); // 起動時のサウンド
