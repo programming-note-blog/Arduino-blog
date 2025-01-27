@@ -123,7 +123,6 @@ unsigned short SensorControlUpdateThresholds()
  */
 unsigned char SensorControlGetBinaryOutput()
 {
-	SensorControlLedOn();
 
 	unsigned char binaryOutput = 0;
 	for (unsigned short i = 0; i < NUM_SENSORS; i++)
@@ -134,7 +133,5 @@ unsigned char SensorControlGetBinaryOutput()
 			binaryOutput |= (1 << i);
 		}
 	}
-
-	SensorControlLedOff();
 	return binaryOutput;
 }

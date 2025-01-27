@@ -30,6 +30,7 @@ struct FrameInfo
 	short rightSpeed = 0;		   ///< 右モーター速度
 	float center = 0.0f;		   ///< ラインの中心位置
 	float error = 0.0f;			   ///< ライン中心からの偏差
+	short adjustment = 0;		   ///< モーター制御量
 	float previousError = 0.0f;	   ///< 前回の偏差
 	float integral = 0.0f;		   ///< 偏差の積分値
 };
@@ -128,10 +129,10 @@ static void CalculateMotorSpeeds()
 	const float Kd = 10.0f;		 ///< 微分ゲイン
 
 	float derivative = frameInfo.error - frameInfo.previousError;
-	short adjustment = static_cast<short>(Kp * frameInfo.error + Ki * frameInfo.integral + Kd * derivative);
+	frameInfo.adjustment = static_cast<short>(Kp * frameInfo.error + Ki * frameInfo.integral + Kd * derivative);
 
-	frameInfo.leftSpeed = baseSpeed + adjustment;
-	frameInfo.rightSpeed = baseSpeed - adjustment;
+	frameInfo.leftSpeed = baseSpeed - frameInfo.adjustment;
+	frameInfo.rightSpeed = baseSpeed + frameInfo.adjustment;
 
 	// モーター速度を制限
 	frameInfo.leftSpeed = constrain(frameInfo.leftSpeed, 0, 255);
@@ -149,6 +150,21 @@ static void ApplyMotorSpeeds()
 	MotorControlSetLeftMotorSpeed(frameInfo.leftSpeed);
 	MotorControlSetRightMotorSpeed(frameInfo.rightSpeed);
 
+	// Serial.print(!!(frameInfo.sensorData & (1 << 7)));
+	// Serial.print(!!(frameInfo.sensorData & (1 << 6)));
+	// Serial.print(!!(frameInfo.sensorData & (1 << 5)));
+	// Serial.print(!!(frameInfo.sensorData & (1 << 4)));
+	// Serial.print(!!(frameInfo.sensorData & (1 << 3)));
+	// Serial.print(!!(frameInfo.sensorData & (1 << 2)));
+	// Serial.print(!!(frameInfo.sensorData & (1 << 1)));
+	// Serial.print(!!(frameInfo.sensorData & (1 << 0)));
+	// Serial.print(",");
+	// Serial.print(frameInfo.center);
+	// Serial.print(",");
+	// Serial.print(frameInfo.error);
+	// Serial.print(",");
+	// Serial.print(frameInfo.adjustment);
+	// Serial.print(",");
 	// Serial.print(frameInfo.leftSpeed);
 	// Serial.print(",");
 	// Serial.println(frameInfo.rightSpeed);
